@@ -588,6 +588,29 @@ export default function TakeExamBlancPage() {
             <CardTitle>Expression orale ({index+1}/{eo.length})</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Message d'instruction */}
+            {!eoAudios[index] && (
+              <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 text-sm">
+                <div className="flex items-start gap-2">
+                  <span className="text-orange-600 text-lg">🎤</span>
+                  <div>
+                    <div className="font-semibold text-orange-900 mb-1">
+                      Enregistrement audio requis
+                    </div>
+                    <div className="text-orange-800">
+                      Vous devez enregistrer votre réponse audio avant de passer à la partie suivante. 
+                      Cliquez sur "Commencer l'enregistrement" ci-dessous.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {eoAudios[index] && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-green-800">
+                ✅ Réponse audio enregistrée pour cette partie
+              </div>
+            )}
             {(() => {
               const s = eo[index] as any;
               const partie = s?.partie_number;
@@ -699,7 +722,20 @@ export default function TakeExamBlancPage() {
               </div>
             ) : (
               <div className="flex gap-2">
-                <Button onClick={next}>{index === eo.length - 1 ? 'Résumé' : 'Suivant'}</Button>
+                <Button 
+                  onClick={() => {
+                    // Vérifier qu'un audio est enregistré avant de passer au suivant
+                    if (!eoAudios[index]) {
+                      setSubmitError(`⚠️ Veuillez enregistrer votre réponse audio pour la partie ${index + 1} avant de continuer`);
+                      return;
+                    }
+                    setSubmitError(null);
+                    next();
+                  }}
+                  disabled={!eoAudios[index]}
+                >
+                  {index === eo.length - 1 ? 'Résumé' : 'Suivant'}
+                </Button>
                 {!progress.eo_done && (
                   <Button onClick={submitStageEO} disabled={isSubmitting}>Soumettre EO</Button>
                 )}
