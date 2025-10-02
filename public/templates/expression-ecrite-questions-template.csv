@@ -1,0 +1,41 @@
+test_series_id,question_text,type,order,media_url,media_type,points
+{SERIES_ID_1},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Décrivez votre ville natale et expliquez pourquoi elle vous plaît.",essay,1,,,10
+{SERIES_ID_2},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Racontez un souvenir d'enfance qui vous a marqué.",essay,1,,,10
+{SERIES_ID_3},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Décrivez votre plat préféré et expliquez comment le préparer.",essay,1,,,10
+{SERIES_ID_4},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Parlez de votre animal de compagnie ou d'un animal que vous aimeriez avoir.",essay,1,,,10
+{SERIES_ID_5},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Décrivez une journée type de votre vie quotidienne.",essay,1,,,10
+{SERIES_ID_6},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Parlez d'un livre ou d'un film qui vous a plu récemment.",essay,1,,,10
+{SERIES_ID_7},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Décrivez votre saison préférée et expliquez pourquoi vous l'aimez.",essay,1,,,10
+{SERIES_ID_8},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Parlez d'un voyage que vous avez fait ou que vous aimeriez faire.",essay,1,,,10
+{SERIES_ID_9},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Décrivez votre métier ou celui que vous aimeriez exercer.",essay,1,,,10
+{SERIES_ID_10},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Parlez d'une fête ou d'une célébration importante dans votre culture.",essay,1,,,10
+{SERIES_ID_11},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Décrivez votre maison idéale et expliquez pourquoi elle vous plaît.",essay,1,,,10
+{SERIES_ID_12},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Parlez d'un ami proche et expliquez pourquoi cette amitié est importante pour vous.",essay,1,,,10
+{SERIES_ID_13},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Décrivez votre loisir préféré et expliquez pourquoi vous l'aimez.",essay,1,,,10
+{SERIES_ID_14},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Parlez d'un problème environnemental qui vous préoccupe.",essay,1,,,10
+{SERIES_ID_15},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Décrivez un repas en famille ou entre amis qui vous a marqué.",essay,1,,,10
+{SERIES_ID_16},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Parlez d'une tradition de votre pays que vous appréciez particulièrement.",essay,1,,,10
+{SERIES_ID_17},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Décrivez votre week-end idéal et expliquez ce que vous aimeriez faire.",essay,1,,,10
+{SERIES_ID_18},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Parlez d'un sport que vous pratiquez ou que vous aimeriez pratiquer.",essay,1,,,10
+{SERIES_ID_19},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Décrivez votre école ou université et ce que vous y apprenez.",essay,1,,,10
+{SERIES_ID_20},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Parlez d'une personne qui vous inspire et expliquez pourquoi.",essay,1,,,10
+{SERIES_ID_21},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Décrivez votre moyen de transport préféré et expliquez pourquoi.",essay,1,,,10
+{SERIES_ID_22},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Parlez d'un événement récent qui vous a rendu heureux.",essay,1,,,10
+{SERIES_ID_23},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Décrivez votre routine matinale et expliquez comment elle vous aide.",essay,1,,,10
+{SERIES_ID_24},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Parlez d'un cadeau que vous avez reçu et qui vous a fait plaisir.",essay,1,,,10
+{SERIES_ID_25},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Décrivez votre restaurant préféré et expliquez pourquoi vous l'aimez.",essay,1,,,10
+{SERIES_ID_26},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Parlez d'une compétence que vous aimeriez apprendre et expliquez pourquoi.",essay,1,,,10
+{SERIES_ID_27},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Décrivez votre quartier et ce que vous y appréciez le plus.",essay,1,,,10
+{SERIES_ID_28},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Parlez d'un défi que vous avez relevé récemment et de ce que vous en avez appris.",essay,1,,,10
+{SERIES_ID_29},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Décrivez votre façon de vous détendre après une journée difficile.",essay,1,,,10
+{SERIES_ID_30},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Parlez d'une découverte récente qui vous a surpris ou intéressé.",essay,1,,,10
+{SERIES_ID_31},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Décrivez votre façon de célébrer votre anniversaire.",essay,1,,,10
+{SERIES_ID_32},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Parlez d'un changement positif que vous avez fait dans votre vie.",essay,1,,,10
+{SERIES_ID_33},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Décrivez votre activité préférée à faire en famille.",essay,1,,,10
+{SERIES_ID_34},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Parlez d'un conseil que vous donneriez à quelqu'un qui apprend le français.",essay,1,,,10
+{SERIES_ID_35},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Décrivez votre façon de rester en contact avec vos amis et votre famille.",essay,1,,,10
+{SERIES_ID_36},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Parlez d'une habitude que vous aimeriez changer et expliquez pourquoi.",essay,1,,,10
+{SERIES_ID_37},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Décrivez votre façon de vous préparer pour un examen important.",essay,1,,,10
+{SERIES_ID_38},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Parlez d'un endroit où vous aimez aller pour réfléchir ou vous reposer.",essay,1,,,10
+{SERIES_ID_39},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Décrivez votre façon de gérer le stress dans votre vie quotidienne.",essay,1,,,10
+{SERIES_ID_40},"Rédigez un texte de 60 à 80 mots sur le sujet suivant : Parlez de vos projets pour l'avenir et de ce que vous espérez accomplir.",essay,1,,,10 

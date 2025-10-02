@@ -1,0 +1,472 @@
+[
+    {
+      "schemaname": "public",
+      "tablename": "modules",
+      "policyname": "Accès public aux modules",
+      "permissive": "PERMISSIVE",
+      "roles": "{public}",
+      "cmd": "SELECT",
+      "qual": "true",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "modules",
+      "policyname": "Admin peut créer des modules",
+      "permissive": "PERMISSIVE",
+      "roles": "{authenticated}",
+      "cmd": "INSERT",
+      "qual": null,
+      "with_check": "(EXISTS ( SELECT 1\n   FROM profiles\n  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text))))"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "modules",
+      "policyname": "Admin peut modifier les modules",
+      "permissive": "PERMISSIVE",
+      "roles": "{authenticated}",
+      "cmd": "UPDATE",
+      "qual": "(EXISTS ( SELECT 1\n   FROM profiles\n  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text))))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "modules",
+      "policyname": "Admin peut supprimer des modules",
+      "permissive": "PERMISSIVE",
+      "roles": "{authenticated}",
+      "cmd": "DELETE",
+      "qual": "(EXISTS ( SELECT 1\n   FROM profiles\n  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text))))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "modules",
+      "policyname": "Tout le monde peut voir les modules",
+      "permissive": "PERMISSIVE",
+      "roles": "{public}",
+      "cmd": "SELECT",
+      "qual": null,
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "modules",
+      "policyname": "nable read access for all users",
+      "permissive": "PERMISSIVE",
+      "roles": "{public}",
+      "cmd": "SELECT",
+      "qual": "true",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "options",
+      "policyname": "options_admin_delete",
+      "permissive": "PERMISSIVE",
+      "roles": "{public}",
+      "cmd": "DELETE",
+      "qual": "(EXISTS ( SELECT 1\n   FROM profiles\n  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text))))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "options",
+      "policyname": "options_admin_insert",
+      "permissive": "PERMISSIVE",
+      "roles": "{public}",
+      "cmd": "INSERT",
+      "qual": null,
+      "with_check": "(EXISTS ( SELECT 1\n   FROM profiles\n  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text))))"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "options",
+      "policyname": "options_admin_update",
+      "permissive": "PERMISSIVE",
+      "roles": "{public}",
+      "cmd": "UPDATE",
+      "qual": "(EXISTS ( SELECT 1\n   FROM profiles\n  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text))))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "options",
+      "policyname": "options_anon_free",
+      "permissive": "PERMISSIVE",
+      "roles": "{anon}",
+      "cmd": "SELECT",
+      "qual": "(EXISTS ( SELECT 1\n   FROM (questions q\n     JOIN test_series ts ON ((ts.id = q.test_series_id)))\n  WHERE ((q.id = options.question_id) AND (ts.is_free = true))))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "options",
+      "policyname": "options_auth_by_subscription",
+      "permissive": "PERMISSIVE",
+      "roles": "{authenticated}",
+      "cmd": "SELECT",
+      "qual": "(EXISTS ( SELECT 1\n   FROM ((questions q\n     JOIN test_series ts ON ((ts.id = q.test_series_id)))\n     LEFT JOIN profiles p ON ((p.id = auth.uid())))\n  WHERE ((q.id = options.question_id) AND ((ts.is_free = true) OR ((p.subscription_status = 'active'::text) AND (p.subscription_expiry > now()))))))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "options",
+      "policyname": "options_public_select",
+      "permissive": "PERMISSIVE",
+      "roles": "{public}",
+      "cmd": "SELECT",
+      "qual": "true",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "profiles",
+      "policyname": "Le système peut créer des profils",
+      "permissive": "PERMISSIVE",
+      "roles": "{public}",
+      "cmd": "INSERT",
+      "qual": null,
+      "with_check": "true"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "profiles",
+      "policyname": "Les utilisateurs peuvent mettre à jour leur propre profil",
+      "permissive": "PERMISSIVE",
+      "roles": "{public}",
+      "cmd": "UPDATE",
+      "qual": "(auth.uid() = id)",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "profiles",
+      "policyname": "Les utilisateurs peuvent voir leur propre profil",
+      "permissive": "PERMISSIVE",
+      "roles": "{public}",
+      "cmd": "SELECT",
+      "qual": "(auth.uid() = id)",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "profiles",
+      "policyname": "profiles_delete_admins",
+      "permissive": "PERMISSIVE",
+      "roles": "{authenticated}",
+      "cmd": "DELETE",
+      "qual": "(EXISTS ( SELECT 1\n   FROM profiles me\n  WHERE ((me.id = auth.uid()) AND (me.role = 'admin'::text))))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "profiles",
+      "policyname": "profiles_select_admins",
+      "permissive": "PERMISSIVE",
+      "roles": "{authenticated}",
+      "cmd": "SELECT",
+      "qual": "((EXISTS ( SELECT 1\n   FROM profiles me\n  WHERE ((me.id = auth.uid()) AND (me.role = 'admin'::text)))) OR (id = auth.uid()))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "profiles",
+      "policyname": "profiles_update_admins",
+      "permissive": "PERMISSIVE",
+      "roles": "{authenticated}",
+      "cmd": "UPDATE",
+      "qual": "(EXISTS ( SELECT 1\n   FROM profiles me\n  WHERE ((me.id = auth.uid()) AND (me.role = 'admin'::text))))",
+      "with_check": "true"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "question_media",
+      "policyname": "Accès public aux médias des questions",
+      "permissive": "PERMISSIVE",
+      "roles": "{public}",
+      "cmd": "SELECT",
+      "qual": "true",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "question_media",
+      "policyname": "Allow public read access for question_media",
+      "permissive": "PERMISSIVE",
+      "roles": "{public}",
+      "cmd": "SELECT",
+      "qual": "true",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "question_media",
+      "policyname": "Seuls les administrateurs peuvent créer des médias",
+      "permissive": "PERMISSIVE",
+      "roles": "{authenticated}",
+      "cmd": "INSERT",
+      "qual": null,
+      "with_check": "(EXISTS ( SELECT 1\n   FROM profiles\n  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text))))"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "question_media",
+      "policyname": "Seuls les administrateurs peuvent modifier des médias",
+      "permissive": "PERMISSIVE",
+      "roles": "{authenticated}",
+      "cmd": "UPDATE",
+      "qual": "(EXISTS ( SELECT 1\n   FROM profiles\n  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text))))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "question_media",
+      "policyname": "Seuls les administrateurs peuvent supprimer des médias",
+      "permissive": "PERMISSIVE",
+      "roles": "{authenticated}",
+      "cmd": "DELETE",
+      "qual": "(EXISTS ( SELECT 1\n   FROM profiles\n  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text))))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "question_media",
+      "policyname": "question_media_anon_free",
+      "permissive": "PERMISSIVE",
+      "roles": "{anon}",
+      "cmd": "SELECT",
+      "qual": "(EXISTS ( SELECT 1\n   FROM (questions q\n     JOIN test_series ts ON ((ts.id = q.test_series_id)))\n  WHERE ((q.id = question_media.question_id) AND (ts.is_free = true))))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "question_media",
+      "policyname": "question_media_auth_by_subscription",
+      "permissive": "PERMISSIVE",
+      "roles": "{authenticated}",
+      "cmd": "SELECT",
+      "qual": "(EXISTS ( SELECT 1\n   FROM ((questions q\n     JOIN test_series ts ON ((ts.id = q.test_series_id)))\n     LEFT JOIN profiles p ON ((p.id = auth.uid())))\n  WHERE ((q.id = question_media.question_id) AND ((ts.is_free = true) OR ((p.subscription_status = 'active'::text) AND (p.subscription_expiry > now()))))))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "questions",
+      "policyname": "questions_admin_delete",
+      "permissive": "PERMISSIVE",
+      "roles": "{public}",
+      "cmd": "DELETE",
+      "qual": "(EXISTS ( SELECT 1\n   FROM profiles\n  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text))))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "questions",
+      "policyname": "questions_admin_insert",
+      "permissive": "PERMISSIVE",
+      "roles": "{public}",
+      "cmd": "INSERT",
+      "qual": null,
+      "with_check": "(EXISTS ( SELECT 1\n   FROM profiles\n  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text))))"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "questions",
+      "policyname": "questions_admin_update",
+      "permissive": "PERMISSIVE",
+      "roles": "{authenticated}",
+      "cmd": "UPDATE",
+      "qual": "(EXISTS ( SELECT 1\n   FROM profiles p\n  WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text))))",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM profiles p\n  WHERE ((p.id = auth.uid()) AND (p.role = 'admin'::text))))"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "questions",
+      "policyname": "questions_anon_free",
+      "permissive": "PERMISSIVE",
+      "roles": "{anon}",
+      "cmd": "SELECT",
+      "qual": "(EXISTS ( SELECT 1\n   FROM test_series ts\n  WHERE ((ts.id = questions.test_series_id) AND (ts.is_free = true))))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "questions",
+      "policyname": "questions_auth_by_subscription",
+      "permissive": "PERMISSIVE",
+      "roles": "{authenticated}",
+      "cmd": "SELECT",
+      "qual": "(EXISTS ( SELECT 1\n   FROM (test_series ts\n     LEFT JOIN profiles p ON ((p.id = auth.uid())))\n  WHERE ((ts.id = questions.test_series_id) AND ((ts.is_free = true) OR ((p.subscription_status = 'active'::text) AND (p.subscription_expiry > now()))))))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "questions",
+      "policyname": "questions_public_select",
+      "permissive": "PERMISSIVE",
+      "roles": "{public}",
+      "cmd": "SELECT",
+      "qual": "true",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "test_series",
+      "policyname": "Accès public aux séries de tests",
+      "permissive": "PERMISSIVE",
+      "roles": "{public}",
+      "cmd": "SELECT",
+      "qual": "true",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "test_series",
+      "policyname": "Admin peut gérer les séries de tests",
+      "permissive": "PERMISSIVE",
+      "roles": "{public}",
+      "cmd": "ALL",
+      "qual": "(EXISTS ( SELECT 1\n   FROM profiles\n  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text))))",
+      "with_check": "(EXISTS ( SELECT 1\n   FROM profiles\n  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text))))"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "test_series",
+      "policyname": "Tous les utilisateurs peuvent voir les séries de tests",
+      "permissive": "PERMISSIVE",
+      "roles": "{public}",
+      "cmd": "SELECT",
+      "qual": "true",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "test_series",
+      "policyname": "test_series_anon_free",
+      "permissive": "PERMISSIVE",
+      "roles": "{anon}",
+      "cmd": "SELECT",
+      "qual": "(is_free = true)",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "test_series",
+      "policyname": "test_series_auth_by_subscription",
+      "permissive": "PERMISSIVE",
+      "roles": "{authenticated}",
+      "cmd": "SELECT",
+      "qual": "((is_free = true) OR (EXISTS ( SELECT 1\n   FROM profiles p\n  WHERE ((p.id = auth.uid()) AND (p.subscription_status = 'active'::text) AND (p.subscription_expiry > now())))))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "user_answers",
+      "policyname": "Les utilisateurs peuvent ajouter leurs propres réponses",
+      "permissive": "PERMISSIVE",
+      "roles": "{public}",
+      "cmd": "INSERT",
+      "qual": null,
+      "with_check": "(EXISTS ( SELECT 1\n   FROM user_tests\n  WHERE ((user_tests.id = user_answers.user_test_id) AND (user_tests.user_id = auth.uid()))))"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "user_answers",
+      "policyname": "Les utilisateurs peuvent mettre à jour leurs propres réponses",
+      "permissive": "PERMISSIVE",
+      "roles": "{public}",
+      "cmd": "UPDATE",
+      "qual": "(EXISTS ( SELECT 1\n   FROM user_tests\n  WHERE ((user_tests.id = user_answers.user_test_id) AND (user_tests.user_id = auth.uid()))))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "user_answers",
+      "policyname": "Les utilisateurs peuvent voir leurs propres réponses",
+      "permissive": "PERMISSIVE",
+      "roles": "{public}",
+      "cmd": "SELECT",
+      "qual": "(EXISTS ( SELECT 1\n   FROM user_tests\n  WHERE ((user_tests.id = user_answers.user_test_id) AND (user_tests.user_id = auth.uid()))))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "user_answers",
+      "policyname": "user_answers_insert",
+      "permissive": "PERMISSIVE",
+      "roles": "{authenticated}",
+      "cmd": "INSERT",
+      "qual": null,
+      "with_check": "(EXISTS ( SELECT 1\n   FROM user_tests ut\n  WHERE ((ut.id = user_answers.user_test_id) AND (ut.user_id = auth.uid()))))"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "user_answers",
+      "policyname": "user_answers_select",
+      "permissive": "PERMISSIVE",
+      "roles": "{authenticated}",
+      "cmd": "SELECT",
+      "qual": "(EXISTS ( SELECT 1\n   FROM user_tests ut\n  WHERE ((ut.id = user_answers.user_test_id) AND (ut.user_id = auth.uid()))))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "user_answers",
+      "policyname": "user_answers_update",
+      "permissive": "PERMISSIVE",
+      "roles": "{authenticated}",
+      "cmd": "UPDATE",
+      "qual": "(EXISTS ( SELECT 1\n   FROM user_tests ut\n  WHERE ((ut.id = user_answers.user_test_id) AND (ut.user_id = auth.uid()))))",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "user_tests",
+      "policyname": "Les utilisateurs peuvent ajouter leurs propres tests",
+      "permissive": "PERMISSIVE",
+      "roles": "{public}",
+      "cmd": "INSERT",
+      "qual": null,
+      "with_check": "(auth.uid() = user_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "user_tests",
+      "policyname": "Les utilisateurs peuvent mettre à jour leurs propres tests",
+      "permissive": "PERMISSIVE",
+      "roles": "{public}",
+      "cmd": "UPDATE",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "user_tests",
+      "policyname": "user_tests_insert",
+      "permissive": "PERMISSIVE",
+      "roles": "{authenticated}",
+      "cmd": "INSERT",
+      "qual": null,
+      "with_check": "(auth.uid() = user_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "user_tests",
+      "policyname": "user_tests_select",
+      "permissive": "PERMISSIVE",
+      "roles": "{authenticated}",
+      "cmd": "SELECT",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": null
+    },
+    {
+      "schemaname": "public",
+      "tablename": "user_tests",
+      "policyname": "user_tests_update",
+      "permissive": "PERMISSIVE",
+      "roles": "{authenticated}",
+      "cmd": "UPDATE",
+      "qual": "(auth.uid() = user_id)",
+      "with_check": null
+    }
+  ]

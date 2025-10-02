@@ -1,0 +1,62 @@
+[
+    {
+      "relname": "options",
+      "polname": "options_admin_insert",
+      "polcmd": "a",
+      "using_expr": null,
+      "with_check_expr": "(EXISTS ( SELECT 1\n   FROM profiles\n  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text))))",
+      "polroles": [
+        0
+      ]
+    },
+    {
+      "relname": "options",
+      "polname": "options_admin_delete",
+      "polcmd": "d",
+      "using_expr": "(EXISTS ( SELECT 1\n   FROM profiles\n  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text))))",
+      "with_check_expr": null,
+      "polroles": [
+        0
+      ]
+    },
+    {
+      "relname": "options",
+      "polname": "options_anon_free",
+      "polcmd": "r",
+      "using_expr": "(EXISTS ( SELECT 1\n   FROM (questions q\n     JOIN test_series ts ON ((ts.id = q.test_series_id)))\n  WHERE ((q.id = options.question_id) AND (ts.is_free = true))))",
+      "with_check_expr": null,
+      "polroles": [
+        16471
+      ]
+    },
+    {
+      "relname": "options",
+      "polname": "options_auth_by_subscription",
+      "polcmd": "r",
+      "using_expr": "(EXISTS ( SELECT 1\n   FROM ((questions q\n     JOIN test_series ts ON ((ts.id = q.test_series_id)))\n     LEFT JOIN profiles p ON ((p.id = auth.uid())))\n  WHERE ((q.id = options.question_id) AND ((ts.is_free = true) OR ((p.subscription_status = 'active'::text) AND (p.subscription_expiry > now()))))))",
+      "with_check_expr": null,
+      "polroles": [
+        16472
+      ]
+    },
+    {
+      "relname": "options",
+      "polname": "options_public_select",
+      "polcmd": "r",
+      "using_expr": "true",
+      "with_check_expr": null,
+      "polroles": [
+        0
+      ]
+    },
+    {
+      "relname": "options",
+      "polname": "options_admin_update",
+      "polcmd": "w",
+      "using_expr": "(EXISTS ( SELECT 1\n   FROM profiles\n  WHERE ((profiles.id = auth.uid()) AND (profiles.role = 'admin'::text))))",
+      "with_check_expr": null,
+      "polroles": [
+        0
+      ]
+    }
+  ] 

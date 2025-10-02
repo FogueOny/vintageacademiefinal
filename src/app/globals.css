@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Base */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* Brand - Vintage Academie (Orange) */
+    --primary: 28 92% 52%;            /* Orange vif et moderne */
+    --primary-foreground: 0 0% 100%;  /* Texte sur orange */
+
+    /* Secondary: variante chaude plus sombre pour les dégradés */
+    --secondary: 18 75% 45%;
+    --secondary-foreground: 0 0% 100%;
+
+    /* Neutres */
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 16% 47%;
+
+    --accent: 210 20% 96%;
+    --accent-foreground: 222 47% 11%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 28 92% 52%;
+
+    --radius: 0.6rem;
+
+    /* Chart palette harmonisée à la marque */
+    --chart-1: 28 92% 52%;   /* orange */
+    --chart-2: 18 75% 45%;   /* orange foncé */
+    --chart-3: 43 85% 55%;   /* amber/doré */
+    --chart-4: 200 90% 45%;  /* bleu contrasté */
+    --chart-5: 160 65% 42%;  /* vert accent */
+  }
+  .dark {
+    --background: 222 47% 6%;
+    --foreground: 0 0% 98%;
+    --card: 222 47% 7.5%;
+    --card-foreground: 0 0% 98%;
+    --popover: 222 47% 7.5%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 28 92% 52%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 18 75% 45%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 223 47% 10%;
+    --muted-foreground: 0 0% 70%;
+    --accent: 223 47% 10%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 45.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 222 47% 12%;
+    --input: 222 47% 12%;
+    --ring: 28 92% 52%;
+    --chart-1: 28 92% 52%;
+    --chart-2: 18 75% 45%;
+    --chart-3: 43 85% 55%;
+    --chart-4: 200 90% 45%;
+    --chart-5: 160 65% 42%;
+  }
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}

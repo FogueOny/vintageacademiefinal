@@ -1,0 +1,42 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+# Configuration optimisée pour le déploiement
+[build.environment]
+  NODE_VERSION = "20"
+  NPM_FLAGS = "--production=false"
+  # Ignorer les erreurs ESLint pendant le build
+  NEXT_TELEMETRY_DISABLED = "1"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Redirections pour gérer correctement les routes Next.js
+[[redirects]]
+  from = "/_next/static/*"
+  to = "/_next/static/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/_next/data/*"
+  to = "/_next/data/:splat"
+  status = 200
+
+ # Removed catch-all redirect to allow Next.js plugin and middleware to handle routing
+
+# Règles pour les images et les assets statiques
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+    
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

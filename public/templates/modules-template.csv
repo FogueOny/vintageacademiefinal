@@ -1,0 +1,5 @@
+name,description,type,type_module,icon,slug
+"Compréhension Écrite TEF","Module de compréhension écrite du TEF","comprehension_ecrite","tef","book",""
+"Compréhension Orale TCF","Module de compréhension orale du TCF","comprehension_orale","tcf","headphones",""
+"Expression Écrite IELTS","Module d'expression écrite de l'IELTS","expression_ecrite","ielts","pen",""
+"Expression Orale TEF","Module d'expression orale du TEF","expression_orale","tef","microphone",""

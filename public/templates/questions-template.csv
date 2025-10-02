@@ -1,0 +1,15 @@
+test_series_id,question_text,type,order,media_url,media_type,options,answers,pairs
+"series_1","Choisissez la bonne réponse: Le candidat a ___ son examen.","multiple_choice",1,"","","passé:true,manqué:false,validé:false","",""
+"series_1","Écoutez l'audio et sélectionnez les informations mentionnées.","multiple_choice",2,"/audio/conversation1.mp3","audio","Trois personnes participent à la discussion:true,La conversation se déroule dans un magasin:false,Le sujet principal concerne un voyage:true","",""
+"series_2","Complétez la phrase: La France est un pays _____.","fill_blank",1,"","","","européen,d'Europe,européenne",""
+"series_2","Associez les mots de la colonne A avec leurs synonymes de la colonne B.","matching",2,"","","","","bonjour:salut,petit:minuscule,beau:joli,rapide:véloce"
+
+NOTES:
+- test_series_id doit correspondre à un ID de série de test existant dans la base de données
+- type peut être: multiple_choice, fill_blank, matching
+- order est l'ordre d'affichage de la question dans la série
+- media_url est le chemin vers un média (audio, image) associé à la question (à ajouter manuellement après)
+- media_type peut être: audio, image
+- options (pour multiple_choice): format "texte:is_correct,texte:is_correct,..." (texte de l'option:vrai/faux)
+- answers (pour fill_blank): format "réponse1,réponse2,..." (liste des réponses correctes possibles)
+- pairs (pour matching): format "gauche1:droite1,gauche2:droite2,..." (paires d'éléments à associer)
