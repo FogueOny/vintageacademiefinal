@@ -5,6 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { AudioPlayer } from '@/components/exam/AudioPlayer';
+import { ExpressionCorrectionForm } from '@/components/exam/ExpressionCorrectionForm';
 
 interface QAItem {
   id: string;
@@ -45,6 +47,7 @@ export default function ExamBlancSubmissionDetailPage() {
   const [loading, setLoading] = useState(false);
   const [eePicking, setEePicking] = useState<string>('');
   const [eoPicking, setEoPicking] = useState<string>('');
+  const [expressionResponses, setExpressionResponses] = useState<any[]>([]);
   // Read-only view: no saving/actions
 
   const load = async () => {
@@ -64,6 +67,22 @@ export default function ExamBlancSubmissionDetailPage() {
   };
 
   useEffect(() => { load(); }, [id]);
+
+  // Charger les réponses Expression Écrite et Orale
+  const loadExpressions = async () => {
+    if (!id) return;
+    try {
+      const res = await fetch(`/api/exam-submissions/${id}/expressions`);
+      if (res.ok) {
+        const json = await res.json();
+        setExpressionResponses(json.data || []);
+      }
+    } catch (error) {
+      console.error('Erreur chargement expressions:', error);
+    }
+  };
+
+  useEffect(() => { loadExpressions(); }, [id]);
 
   // Replace EE task with a random one when current is empty
   const pickRandomEE = async (taskNumber: number, currentId?: string) => {
@@ -349,6 +368,123 @@ export default function ExamBlancSubmissionDetailPage() {
               )}
             </div>
           )})}
+        </CardContent>
+      </Card>
+
+      {/* Section Expression Écrite - Réponses utilisateur */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Expression Écrite (EE) - Réponses utilisateur</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {expressionResponses
+            .filter(r => r.type === 'expression_ecrite')
+            .sort((a, b) => (a.task_number || 0) - (b.task_number || 0))
+            .map(response => (
+              <div key={response.id} className="border-l-4 border-orange-500 pl-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold">Tâche {response.task_number}</h3>
+                  {response.admin_score !== null && response.admin_score !== undefined && (
+                    <Badge variant="secondary">Score: {response.admin_score}/25</Badge>
+                  )}
+                </div>
+                
+                <div className="bg-gray-50 p-4 rounded border">
+                  <div className="whitespace-pre-wrap text-sm">{response.text_response}</div>
+                  <div className="text-xs text-gray-500 mt-2">
+                    Mots: {response.word_count}
+                  </div>
+                </div>
+                
+                {response.admin_feedback && (
+                  <div className="bg-blue-50 p-3 rounded border border-blue-200 text-sm">
+                    <div className="font-medium text-blue-900 mb-1">Feedback:</div>
+                    <div className="text-blue-800">{response.admin_feedback}</div>
+                    {response.corrected_at && (
+                      <div className="text-xs text-blue-600 mt-2">
+                        Corrigé le {new Date(response.corrected_at).toLocaleString('fr-FR')}
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                <ExpressionCorrectionForm
+                  responseId={response.id}
+                  submissionId={id}
+                  type="expression_ecrite"
+                  taskNumber={response.task_number}
+                  currentScore={response.admin_score}
+                  currentFeedback={response.admin_feedback}
+                  onCorrectionSaved={() => {
+                    load();
+                    loadExpressions();
+                  }}
+                />
+              </div>
+            ))}
+          {expressionResponses.filter(r => r.type === 'expression_ecrite').length === 0 && (
+            <div className="text-sm text-gray-500 text-center py-4">
+              Aucune réponse Expression Écrite soumise
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Section Expression Orale - Réponses audio utilisateur */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Expression Orale (EO) - Réponses audio utilisateur</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {expressionResponses
+            .filter(r => r.type === 'expression_orale')
+            .sort((a, b) => (a.partie_number || 0) - (b.partie_number || 0))
+            .map(response => (
+              <div key={response.id} className="border-l-4 border-orange-500 pl-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold">Partie {response.partie_number}</h3>
+                  {response.admin_score !== null && response.admin_score !== undefined && (
+                    <Badge variant="secondary">Score: {response.admin_score}/25</Badge>
+                  )}
+                </div>
+                
+                <AudioPlayer
+                  audioUrl={response.audio_url}
+                  duration={response.audio_duration_seconds}
+                  title={`Réponse orale - Partie ${response.partie_number}`}
+                />
+                
+                {response.admin_feedback && (
+                  <div className="bg-blue-50 p-3 rounded border border-blue-200 text-sm">
+                    <div className="font-medium text-blue-900 mb-1">Feedback:</div>
+                    <div className="text-blue-800">{response.admin_feedback}</div>
+                    {response.corrected_at && (
+                      <div className="text-xs text-blue-600 mt-2">
+                        Corrigé le {new Date(response.corrected_at).toLocaleString('fr-FR')}
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                <ExpressionCorrectionForm
+                  responseId={response.id}
+                  submissionId={id}
+                  type="expression_orale"
+                  partieNumber={response.partie_number}
+                  currentScore={response.admin_score}
+                  currentFeedback={response.admin_feedback}
+                  onCorrectionSaved={() => {
+                    load();
+                    loadExpressions();
+                  }}
+                />
+              </div>
+            ))}
+          {expressionResponses.filter(r => r.type === 'expression_orale').length === 0 && (
+            <div className="text-sm text-gray-500 text-center py-4">
+              Aucune réponse Expression Orale soumise
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

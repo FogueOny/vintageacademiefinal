@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useSession } from '@/hooks/use-session';
+import { AudioRecorder } from '@/components/exam/AudioRecorder';
 
 type Plan = {
   comprehension_co?: Array<{ id: string; type?: 'CO'; content?: string; title?: string; }>
@@ -39,6 +40,7 @@ export default function TakeExamBlancPage() {
   const [compCEAnswers, setCompCEAnswers] = useState<Record<string, string>>({});
   const [eeNotes, setEeNotes] = useState<Record<number, string>>({});
   const [eoNotes, setEoNotes] = useState<Record<number, string>>({});
+  const [eoAudios, setEoAudios] = useState<Record<number, { url: string; duration: number }>>({});
   const [questionDetails, setQuestionDetails] = useState<Record<string, any>>({});
   const { user, loading: authLoading } = useSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -127,6 +129,97 @@ export default function TakeExamBlancPage() {
       return true;
     } catch (e: any) {
       setSubmitError(e?.message || 'Erreur inconnue');
+      return false;
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Fonction pour soumettre Expression Écrite avec textes
+  const submitStageEE = async () => {
+    if (!submissionId || !user) return false;
+    setIsSubmitting(true);
+    setSubmitError(null);
+    
+    try {
+      // Enregistrer chaque tâche EE
+      for (const task of ee) {
+        const text = eeNotes[task.task_number];
+        if (!text || !text.trim()) continue;
+        
+        const wordCount = text.trim().split(/\s+/).length;
+        
+        const res = await fetch(`/api/exam-submissions/${submissionId}/expressions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'expression_ecrite',
+            task_id: task.id,
+            task_number: task.task_number,
+            text_response: text,
+            word_count: wordCount,
+          }),
+        });
+        
+        if (!res.ok) {
+          const json = await res.json();
+          throw new Error(json.error || 'Erreur enregistrement EE');
+        }
+      }
+      
+      // Marquer EE comme terminé
+      return await submitStage('EE');
+    } catch (e: any) {
+      setSubmitError(e?.message || 'Erreur soumission EE');
+      return false;
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Fonction pour soumettre Expression Orale avec audios
+  const submitStageEO = async () => {
+    if (!submissionId || !user) return false;
+    
+    // Vérifier que tous les audios sont enregistrés
+    for (let i = 0; i < eo.length; i++) {
+      if (!eoAudios[i]) {
+        setSubmitError(`Veuillez enregistrer votre réponse pour la partie ${i + 1}`);
+        return false;
+      }
+    }
+    
+    setIsSubmitting(true);
+    setSubmitError(null);
+    
+    try {
+      // Enregistrer chaque audio EO
+      for (let i = 0; i < eo.length; i++) {
+        const audio = eoAudios[i];
+        const task = eo[i] as any;
+        
+        const res = await fetch(`/api/exam-submissions/${submissionId}/expressions`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'expression_orale',
+            task_id: task.id,
+            partie_number: task.partie_number,
+            audio_url: audio.url,
+            audio_duration_seconds: audio.duration,
+          }),
+        });
+        
+        if (!res.ok) {
+          const json = await res.json();
+          throw new Error(json.error || 'Erreur enregistrement EO');
+        }
+      }
+      
+      // Marquer EO comme terminé
+      return await submitStage('EO');
+    } catch (e: any) {
+      setSubmitError(e?.message || 'Erreur soumission EO');
       return false;
     } finally {
       setIsSubmitting(false);
@@ -514,13 +607,31 @@ export default function TakeExamBlancPage() {
                 </div>
               );
             })()}
+            
+            {/* Composant d'enregistrement audio */}
+            {user && submissionId && (
+              <AudioRecorder
+                userId={user.id}
+                submissionId={submissionId}
+                taskIndex={index}
+                maxDurationSeconds={180}
+                onAudioReady={(audioUrl, duration) => {
+                  setEoAudios(prev => ({
+                    ...prev,
+                    [index]: { url: audioUrl, duration }
+                  }));
+                }}
+              />
+            )}
+            
+            {/* Notes optionnelles */}
             <div className="space-y-2">
-              <div className="text-xs text-gray-500">Vos notes (non enregistrées côté serveur)</div>
+              <div className="text-xs text-gray-500">Notes personnelles (optionnel)</div>
               <textarea
-                className="w-full border rounded p-2 text-sm min-h-[120px]"
+                className="w-full border rounded p-2 text-sm min-h-[80px]"
                 value={eoNotes[index] || ''}
                 onChange={(e) => setEoNotes({ ...eoNotes, [index]: e.target.value })}
-                placeholder="Préparez vos notes de prise de parole (non enregistrées)"
+                placeholder="Notes pour vous aider (non enregistrées)"
               />
             </div>
           </CardContent>
@@ -559,11 +670,11 @@ export default function TakeExamBlancPage() {
                     if (!ok) return;
                   }
                   if (!progress.ee_done) {
-                    const ok = await submitStage('EE');
+                    const ok = await submitStageEE();
                     if (!ok) return;
                   }
                   if (!progress.eo_done) {
-                    const ok = await submitStage('EO');
+                    const ok = await submitStageEO();
                     if (!ok) return;
                   }
                 }}
@@ -583,14 +694,14 @@ export default function TakeExamBlancPage() {
               <div className="flex gap-2">
                 <Button onClick={next}>{index === ee.length - 1 ? 'Aller à EO' : 'Suivant'}</Button>
                 {!progress.ee_done && (
-                  <Button onClick={() => submitStage('EE')} disabled={isSubmitting}>Soumettre EE</Button>
+                  <Button onClick={submitStageEE} disabled={isSubmitting}>Soumettre EE</Button>
                 )}
               </div>
             ) : (
               <div className="flex gap-2">
                 <Button onClick={next}>{index === eo.length - 1 ? 'Résumé' : 'Suivant'}</Button>
                 {!progress.eo_done && (
-                  <Button onClick={() => submitStage('EO')} disabled={isSubmitting}>Soumettre EO</Button>
+                  <Button onClick={submitStageEO} disabled={isSubmitting}>Soumettre EO</Button>
                 )}
               </div>
             )}
