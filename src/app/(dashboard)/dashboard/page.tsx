@@ -580,13 +580,22 @@ export default function DashboardPage() {
                     <span className="text-xs bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full">Conditions réelles</span>
                     <span className="text-xs bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full">Évaluation</span>
                   </div>
-                  <Link
-                    href="/dashboard/exam-blanc"
-                    onClick={() => setIsNavigating(true)}
-                    className="inline-block w-full bg-primary text-primary-foreground font-bold py-3 px-4 rounded text-center hover:bg-primary/90 transition-colors"
-                  >
-                    Démarrer
-                  </Link>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Link
+                      href="/dashboard/exam-blanc"
+                      onClick={() => setIsNavigating(true)}
+                      className="inline-block w-full bg-primary text-primary-foreground font-bold py-3 px-4 rounded text-center hover:bg-primary/90 transition-colors"
+                    >
+                      Démarrer
+                    </Link>
+                    <Link
+                      href="/dashboard/mes-examens"
+                      onClick={() => setIsNavigating(true)}
+                      className="inline-block w-full bg-gray-100 text-gray-800 font-bold py-3 px-4 rounded text-center hover:bg-gray-200 transition-colors"
+                    >
+                      Mes résultats
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>

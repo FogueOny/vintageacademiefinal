@@ -44,10 +44,12 @@ interface SubmissionDetail {
     task_number?: number;
     title?: string;
     description?: string;
+    documents?: Array<{ id: string; document_number: number; content: string }>;
   }>;
   expression_orale?: Array<{
     id: string;
     partie_number?: number;
+    subject_number?: number;
     question?: string;
     content?: string;
   }>;
@@ -277,37 +279,66 @@ export default function ExamBlancResultsPage() {
             <CardTitle>Expression Écrite (EE)</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {eeResponses.map((response) => (
-              <div key={response.id} className="border rounded-lg p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="font-semibold">Tâche {response.task_number}</div>
-                  {response.admin_score !== null && response.admin_score !== undefined ? (
-                    <Badge variant="default">{response.admin_score}/25 points</Badge>
-                  ) : (
-                    <Badge variant="secondary">En attente de correction</Badge>
+            {eeResponses.map((response) => {
+              const eeTask = data.expression_ecrite?.find(t => t.task_number === response.task_number);
+              
+              return (
+                <div key={response.id} className="border rounded-lg p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="font-semibold">Tâche {response.task_number}</div>
+                    {response.admin_score !== null && response.admin_score !== undefined ? (
+                      <Badge variant="default">{response.admin_score}/25 points</Badge>
+                    ) : (
+                      <Badge variant="secondary">En attente de correction</Badge>
+                    )}
+                  </div>
+
+                  {/* Sujet de la tâche */}
+                  {eeTask && (
+                    <div className="bg-blue-50 border border-blue-200 p-3 rounded space-y-2">
+                      {eeTask.title && <div className="font-medium text-blue-900">{eeTask.title}</div>}
+                      {eeTask.description && <div className="text-sm text-blue-800 whitespace-pre-wrap">{eeTask.description}</div>}
+                      
+                      {/* Documents */}
+                      {eeTask.documents && eeTask.documents.length > 0 && (
+                        <div className="space-y-2 mt-2">
+                          {eeTask.documents.map((doc) => (
+                            <div key={doc.id} className="bg-white p-2 rounded border border-blue-200">
+                              <div className="text-xs font-medium text-blue-900 mb-1">Document {doc.document_number}</div>
+                              <div className="text-sm text-gray-700 whitespace-pre-wrap">{doc.content}</div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Votre réponse */}
+                  {response.user_text && (
+                    <div>
+                      <div className="text-sm font-medium mb-1">Votre réponse:</div>
+                      <div className="bg-gray-50 p-3 rounded text-sm whitespace-pre-wrap border">
+                        {response.user_text}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Feedback admin */}
+                  {response.admin_feedback && (
+                    <div className="bg-green-50 border border-green-200 p-3 rounded">
+                      <div className="font-medium text-green-900 mb-1">Feedback de l'examinateur:</div>
+                      <div className="text-sm text-green-800 whitespace-pre-wrap">{response.admin_feedback}</div>
+                    </div>
+                  )}
+
+                  {response.corrected_at && (
+                    <div className="text-xs text-gray-500">
+                      Corrigé le {new Date(response.corrected_at).toLocaleDateString('fr-FR')}
+                    </div>
                   )}
                 </div>
-
-                {response.user_text && (
-                  <div className="bg-gray-50 p-3 rounded text-sm whitespace-pre-wrap">
-                    {response.user_text}
-                  </div>
-                )}
-
-                {response.admin_feedback && (
-                  <div className="bg-blue-50 border border-blue-200 p-3 rounded">
-                    <div className="font-medium text-blue-900 mb-1">Feedback de l'examinateur:</div>
-                    <div className="text-sm text-blue-800 whitespace-pre-wrap">{response.admin_feedback}</div>
-                  </div>
-                )}
-
-                {response.corrected_at && (
-                  <div className="text-xs text-gray-500">
-                    Corrigé le {new Date(response.corrected_at).toLocaleDateString('fr-FR')}
-                  </div>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </CardContent>
         </Card>
       )}
@@ -319,38 +350,61 @@ export default function ExamBlancResultsPage() {
             <CardTitle>Expression Orale (EO)</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {eoResponses.map((response) => (
-              <div key={response.id} className="border rounded-lg p-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="font-semibold">Partie {response.partie_number}</div>
-                  {response.admin_score !== null && response.admin_score !== undefined ? (
-                    <Badge variant="default">{response.admin_score}/25 points</Badge>
-                  ) : (
-                    <Badge variant="secondary">En attente de correction</Badge>
+            {eoResponses.map((response) => {
+              const eoTask = data.expression_orale?.find(t => t.partie_number === response.partie_number);
+              
+              return (
+                <div key={response.id} className="border rounded-lg p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="font-semibold">Partie {response.partie_number}</div>
+                    {response.admin_score !== null && response.admin_score !== undefined ? (
+                      <Badge variant="default">{response.admin_score}/25 points</Badge>
+                    ) : (
+                      <Badge variant="secondary">En attente de correction</Badge>
+                    )}
+                  </div>
+
+                  {/* Sujet de la partie */}
+                  {eoTask && (
+                    <div className="bg-purple-50 border border-purple-200 p-3 rounded space-y-2">
+                      {eoTask.subject_number && (
+                        <div className="text-xs font-medium text-purple-900">Sujet #{eoTask.subject_number}</div>
+                      )}
+                      {eoTask.question && (
+                        <div className="font-medium text-purple-900">{eoTask.question}</div>
+                      )}
+                      {eoTask.content && (
+                        <div className="text-sm text-purple-800 whitespace-pre-wrap bg-white p-2 rounded border border-purple-200">
+                          {eoTask.content}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Votre enregistrement */}
+                  {response.audio_url && (
+                    <div>
+                      <div className="text-sm font-medium mb-2">Votre enregistrement:</div>
+                      <AudioPlayer audioUrl={response.audio_url} />
+                    </div>
+                  )}
+
+                  {/* Feedback admin */}
+                  {response.admin_feedback && (
+                    <div className="bg-green-50 border border-green-200 p-3 rounded">
+                      <div className="font-medium text-green-900 mb-1">Feedback de l'examinateur:</div>
+                      <div className="text-sm text-green-800 whitespace-pre-wrap">{response.admin_feedback}</div>
+                    </div>
+                  )}
+
+                  {response.corrected_at && (
+                    <div className="text-xs text-gray-500">
+                      Corrigé le {new Date(response.corrected_at).toLocaleDateString('fr-FR')}
+                    </div>
                   )}
                 </div>
-
-                {response.audio_url && (
-                  <div>
-                    <div className="text-sm font-medium mb-2">Votre enregistrement:</div>
-                    <AudioPlayer audioUrl={response.audio_url} />
-                  </div>
-                )}
-
-                {response.admin_feedback && (
-                  <div className="bg-blue-50 border border-blue-200 p-3 rounded">
-                    <div className="font-medium text-blue-900 mb-1">Feedback de l'examinateur:</div>
-                    <div className="text-sm text-blue-800 whitespace-pre-wrap">{response.admin_feedback}</div>
-                  </div>
-                )}
-
-                {response.corrected_at && (
-                  <div className="text-xs text-gray-500">
-                    Corrigé le {new Date(response.corrected_at).toLocaleDateString('fr-FR')}
-                  </div>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </CardContent>
         </Card>
       )}
