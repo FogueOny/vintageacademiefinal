@@ -30,16 +30,36 @@ export async function GET(_req: Request, ctx: { params: { id: string } } | Promi
 
     if (ansErr) throw ansErr;
 
-    const comprehension = (ans || []).map((a: any) => ({
-      id: a.question_id,
-      type: a.question_type,
-      prompt: a.prompt,
-      // options omitted in this lightweight detail; can be fetched if needed
-      correct_option_id: a.correct_option_id,
-      correct_label: a.correct_option_label,
-      user_option_id: a.user_option_id,
-      user_label: a.user_label || a.user_option_label,
-    }));
+    // Load all options for each question
+    const questionIds = (ans || []).map((a: any) => a.question_id);
+    let allOptions: any[] = [];
+    if (questionIds.length > 0) {
+      const { data: opts } = await supabase
+        .from('options')
+        .select('id, question_id, label, content, is_correct')
+        .in('question_id', questionIds)
+        .order('label', { ascending: true });
+      allOptions = opts || [];
+    }
+
+    const comprehension = (ans || []).map((a: any) => {
+      const questionOptions = allOptions.filter((o: any) => o.question_id === a.question_id);
+      return {
+        id: a.question_id,
+        type: a.question_type,
+        prompt: a.prompt,
+        options: questionOptions.map((o: any) => ({
+          id: o.id,
+          label: o.label,
+          content: o.content,
+          is_correct: o.is_correct,
+        })),
+        correct_option_id: a.correct_option_id,
+        correct_label: a.correct_option_label,
+        user_option_id: a.user_option_id,
+        user_label: a.user_label || a.user_option_label,
+      };
+    });
 
     // Load plan to expose EE/EO subjects from plan JSON
     let ee: any = null;
