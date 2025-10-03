@@ -46,9 +46,9 @@ export function useAuthUnified() {
       try {
         const supabase = getSupabaseBrowser();
         
-        // Timeout pour éviter les blocages réseau (augmenté pour réduire les faux négatifs)
+        // Timeout réduit pour éviter les blocages (3 secondes)
         const authTimeout = new Promise<never>((_, reject) => 
-          setTimeout(() => reject(new Error('Auth timeout')), 12000)
+          setTimeout(() => reject(new Error('Auth timeout')), 3000)
         );
 
         // Vérifier l'utilisateur avec timeout
@@ -65,7 +65,7 @@ export function useAuthUnified() {
         if (user) {
           try {
             const profileTimeout = new Promise<never>((_, reject) => 
-              setTimeout(() => reject(new Error('Profile timeout')), 6000)
+              setTimeout(() => reject(new Error('Profile timeout')), 3000)
             );
 
             const profileResult = await Promise.race([
@@ -102,21 +102,46 @@ export function useAuthUnified() {
         return newState;
 
       } catch (error) {
-        console.warn('Erreur auth, conservation de l\'état précédent si disponible:', error);
+        console.warn('⚠️ Auth timeout/erreur - mode dégradé:', error);
         
-        // Si on a déjà un état global (ex: utilisateur connu), ne pas flasher en anonyme
-        if (globalAuthState) {
+        // Si on a déjà un état global (ex: utilisateur connu), le conserver
+        if (globalAuthState && globalAuthState.user) {
+          console.log('✅ Conservation de l\'état utilisateur existant');
           const preserved: AuthState = { ...globalAuthState, loading: false };
           globalAuthState = preserved;
           return preserved;
         }
 
-        // Sinon, fallback anonyme
+        // Sinon, essayer une dernière fois sans timeout
+        try {
+          console.log('🔄 Tentative de récupération sans timeout...');
+          const supabase = getSupabaseBrowser();
+          const { data: { user } } = await supabase.auth.getUser();
+          
+          if (user) {
+            console.log('✅ Utilisateur récupéré:', user.email);
+            const fallbackState: AuthState = {
+              user,
+              profile: null,
+              loading: false,
+              error: null,
+              isAuthenticated: true,
+              hasActiveSubscription: false,
+            };
+            globalAuthState = fallbackState;
+            return fallbackState;
+          }
+        } catch (retryError) {
+          console.error('❌ Retry échoué:', retryError);
+        }
+
+        // Fallback anonyme en dernier recours
+        console.log('⚠️ Fallback mode anonyme');
         const errorState: AuthState = {
           user: null,
           profile: null,
           loading: false,
-          error: null, // Pas d'erreur visible, juste mode anonyme
+          error: null,
           isAuthenticated: false,
           hasActiveSubscription: false,
         };
