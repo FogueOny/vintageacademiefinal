@@ -208,7 +208,6 @@ export default function DashboardPage() {
   useEffect(() => {
     let abortCleanup: (() => void) | undefined;
     let mounted = true;
-    let retryTimeout: NodeJS.Timeout | null = null;
 
     // Toujours charger les données au montage du composant
     loadDashboardData().then((cleanup) => {
@@ -216,14 +215,6 @@ export default function DashboardPage() {
         abortCleanup = cleanup;
       }
     });
-
-    // Retry automatique si pas de données après 4 secondes
-    retryTimeout = setTimeout(() => {
-      if (mounted && !user && !loading) {
-        console.log('🔄 Retry automatique - pas de données utilisateur');
-        loadDashboardData();
-      }
-    }, 4000);
 
     try {
       const supabase = getSupabaseBrowser();
@@ -244,18 +235,16 @@ export default function DashboardPage() {
       });
       return () => {
         mounted = false;
-        if (retryTimeout) clearTimeout(retryTimeout);
         abortCleanup?.();
         subscriptionListener.subscription?.unsubscribe();
       };
     } catch (_error) {
       return () => {
         mounted = false;
-        if (retryTimeout) clearTimeout(retryTimeout);
         abortCleanup?.();
       };
     }
-  }, [loadDashboardData, user, loading]);
+  }, [loadDashboardData]);
 
   if (loading) {
     return (
