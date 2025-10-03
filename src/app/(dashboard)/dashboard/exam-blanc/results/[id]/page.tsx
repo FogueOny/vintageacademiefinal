@@ -133,6 +133,7 @@ export default function ExamBlancResultsPage() {
     );
   }
 
+  console.log('📊 Full data:', data);
   console.log('📊 Data comprehension:', data.comprehension);
   console.log('📊 Expression responses:', expressionResponses);
   
@@ -141,8 +142,8 @@ export default function ExamBlancResultsPage() {
   const eeResponses = expressionResponses.filter(r => r.type === 'expression_ecrite');
   const eoResponses = expressionResponses.filter(r => r.type === 'expression_orale');
   
-  console.log('📊 CO Questions:', coQuestions.length);
-  console.log('📊 CE Questions:', ceQuestions.length);
+  console.log('📊 CO Questions:', coQuestions.length, coQuestions);
+  console.log('📊 CE Questions:', ceQuestions.length, ceQuestions);
 
   const coCorrect = coQuestions.filter(q => 
     q.user_option_id === q.correct_option_id || q.user_label === q.correct_label
