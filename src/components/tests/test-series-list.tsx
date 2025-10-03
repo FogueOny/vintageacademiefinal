@@ -286,7 +286,13 @@ export function TestSeriesList({ moduleSlug, moduleTitle }: TestSeriesListProps)
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center py-10">Chargement des séries de tests...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center py-10 space-y-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <p className="text-muted-foreground">Chargement des séries de tests...</p>
+        <p className="text-sm text-muted-foreground">Si le chargement prend trop de temps, actualisez la page (F5)</p>
+      </div>
+    );
   }
 
   if (error) {
