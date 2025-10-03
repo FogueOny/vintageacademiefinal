@@ -151,27 +151,28 @@ export function AudioRecorder({
 
     setUploading(true);
     try {
-      const supabase = getSupabaseBrowser();
       const fileName = `${userId}/${submissionId}_task${taskIndex}_${Date.now()}.webm`;
 
-      // Upload vers Supabase Storage
-      const { data, error } = await supabase.storage
-        .from('exam-oral-responses')
-        .upload(fileName, audioBlob, {
-          contentType: 'audio/webm',
-          upsert: false
-        });
+      // Upload via API route (utilise service role pour bypasser RLS)
+      const formData = new FormData();
+      formData.append('file', audioBlob, 'audio.webm');
+      formData.append('fileName', fileName);
 
-      if (error) throw error;
+      const response = await fetch('/api/upload-audio', {
+        method: 'POST',
+        body: formData,
+      });
 
-      // Obtenir l'URL publique signée (valide 1 an)
-      const { data: urlData } = await supabase.storage
-        .from('exam-oral-responses')
-        .createSignedUrl(fileName, 31536000); // 1 an
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur upload');
+      }
 
-      if (urlData?.signedUrl) {
-        setUploadedUrl(urlData.signedUrl);
-        onAudioReady(urlData.signedUrl, duration);
+      const { url } = await response.json();
+
+      if (url) {
+        setUploadedUrl(url);
+        onAudioReady(url, duration);
       }
     } catch (error: any) {
       console.error('Erreur upload audio:', error);
