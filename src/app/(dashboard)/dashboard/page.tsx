@@ -112,7 +112,13 @@ export default function DashboardPage() {
       console.log('📊 Début chargement dashboard...');
       setLoading(true);
 
-      const sessionCheck = await ensureValidSession();
+      // Timeout pour ensureValidSession
+      const sessionCheckPromise = ensureValidSession();
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Session check timeout')), 5000)
+      );
+      
+      const sessionCheck = await Promise.race([sessionCheckPromise, timeoutPromise]) as Awaited<ReturnType<typeof ensureValidSession>>;
       console.log('🔐 Session check:', sessionCheck.valid);
       if (!sessionCheck.valid) {
         try { window.localStorage.removeItem('va_role'); } catch (_) {}
@@ -193,6 +199,70 @@ export default function DashboardPage() {
       }
     } catch (error: unknown) {
       console.error('❌ Erreur chargement dashboard:', error);
+      
+      // Si timeout de session check, essayer quand même de charger
+      if (error instanceof Error && error.message === 'Session check timeout') {
+        console.log('⚠️ Session check timeout - tentative de chargement direct...');
+        try {
+          const overview = await fetchJsonWithAuth<OverviewResponse>(
+            '/api/dashboard/overview',
+            { timeoutMs: 8000 }
+          );
+          
+          console.log('✅ Données reçues (bypass session check):', { user: overview.user?.email });
+          setUser(overview.user);
+          setProfile(overview.profile);
+          
+          if (overview.isAdmin) {
+            setIsAdmin(true);
+            try { window.localStorage.setItem('va_role', 'admin'); } catch (_) {}
+            router.replace('/admin-dashboard');
+            return;
+          }
+          
+          setIsAdmin(false);
+          const subscriptionLabel = overview.stats?.subscriptionStatus ?? 'Aucun';
+          let expiryDateStr = '—';
+          if (overview.stats?.subscriptionExpiry) {
+            const d = new Date(overview.stats.subscriptionExpiry);
+            if (!isNaN(d.getTime())) {
+              expiryDateStr = d.toLocaleDateString('fr-FR', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric',
+              });
+            }
+          }
+          
+          const completed = overview.stats?.testsCompleted ?? 0;
+          const average = overview.stats?.averageScore;
+          
+          setCredits(typeof overview.credits === 'number' ? overview.credits : 0);
+          setStats({
+            subscription: subscriptionLabel,
+            expiryDate: expiryDateStr,
+            testsCompleted: completed > 0 ? completed : '—',
+            averageScore: average != null ? `${average}` : '—',
+          });
+          
+          // Charger modules
+          try {
+            const payload = await fetchJsonWithAuth<{ data: Module[] }>(
+              '/api/modules',
+              { timeoutMs: 12000 }
+            );
+            setModules(payload?.data || []);
+          } catch (_) {
+            console.error('Erreur chargement modules');
+          }
+          
+          setLoading(false);
+          return;
+        } catch (bypassError) {
+          console.error('❌ Bypass échoué:', bypassError);
+        }
+      }
+      
       if (typeof error === 'object' && error !== null && 'status' in error && (error as { status?: number }).status === 401) {
         try { window.localStorage.removeItem('va_role'); } catch (_) {}
         router.replace('/login?next=/dashboard');
