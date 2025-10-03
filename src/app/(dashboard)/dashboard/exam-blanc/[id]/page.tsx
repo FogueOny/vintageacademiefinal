@@ -608,7 +608,26 @@ export default function TakeExamBlancPage() {
             
             {eoAudios[index] && (
               <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm text-green-800">
-                ✅ Réponse audio enregistrée pour cette partie
+                ✅ Réponse audio enregistrée pour cette partie ({Math.floor(eoAudios[index].duration)}s)
+              </div>
+            )}
+            
+            {/* Afficher les enregistrements des autres parties */}
+            {eo.length > 1 && (
+              <div className="text-xs text-gray-600 space-y-1">
+                <div className="font-medium">État des enregistrements:</div>
+                {eo.map((_, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <span className={idx === index ? 'font-bold' : ''}>
+                      Partie {idx + 1}:
+                    </span>
+                    {eoAudios[idx] ? (
+                      <span className="text-green-600">✅ Enregistré ({Math.floor(eoAudios[idx].duration)}s)</span>
+                    ) : (
+                      <span className="text-orange-600">⏺️ {idx === index ? 'En cours' : 'Non enregistré'}</span>
+                    )}
+                  </div>
+                ))}
               </div>
             )}
             {(() => {
@@ -634,6 +653,7 @@ export default function TakeExamBlancPage() {
             {/* Composant d'enregistrement audio */}
             {user && submissionId && (
               <AudioRecorder
+                key={`eo-audio-${index}`}
                 userId={user.id}
                 submissionId={submissionId}
                 taskIndex={index}
