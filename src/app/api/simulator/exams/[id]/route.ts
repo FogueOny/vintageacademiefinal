@@ -7,8 +7,7 @@ export async function GET(_req: Request, ctx: { params: { id: string } }) {
     const { id } = ctx.params || ({} as any);
     if (!id) return NextResponse.json({ error: 'id requis' }, { status: 400 });
 
-    // Cookies handled by createServerSupabaseClient
-    const supabase = createRouteHandlerClient<Database>({ cookies: () => cookieStore });
+    const supabase = await createServerSupabaseClient();
 
     const { data: combo, error } = await supabase
       .from('expression_ecrite_combinations')
