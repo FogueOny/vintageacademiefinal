@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AudioPlayer } from '@/components/exam/AudioPlayer';
 import { ExpressionCorrectionForm } from '@/components/exam/ExpressionCorrectionForm';
+import { AIEvaluationButton } from '@/components/exam/AIEvaluationButton';
 
 interface QAItem {
   id: string;
@@ -408,6 +409,17 @@ export default function ExamBlancSubmissionDetailPage() {
                   </div>
                 )}
                 
+                {/* Bouton évaluation IA */}
+                <AIEvaluationButton
+                  responseId={response.id}
+                  submissionId={id}
+                  type="expression_ecrite"
+                  onEvaluated={() => {
+                    load();
+                    loadExpressions();
+                  }}
+                />
+                
                 <ExpressionCorrectionForm
                   responseId={response.id}
                   submissionId={id}
@@ -457,7 +469,7 @@ export default function ExamBlancSubmissionDetailPage() {
                 {response.admin_feedback && (
                   <div className="bg-blue-50 p-3 rounded border border-blue-200 text-sm">
                     <div className="font-medium text-blue-900 mb-1">Feedback:</div>
-                    <div className="text-blue-800">{response.admin_feedback}</div>
+                    <div className="text-blue-800 whitespace-pre-wrap">{response.admin_feedback}</div>
                     {response.corrected_at && (
                       <div className="text-xs text-blue-600 mt-2">
                         Corrigé le {new Date(response.corrected_at).toLocaleString('fr-FR')}
@@ -465,6 +477,17 @@ export default function ExamBlancSubmissionDetailPage() {
                     )}
                   </div>
                 )}
+                
+                {/* Bouton évaluation IA */}
+                <AIEvaluationButton
+                  responseId={response.id}
+                  submissionId={id}
+                  type="expression_orale"
+                  onEvaluated={() => {
+                    load();
+                    loadExpressions();
+                  }}
+                />
                 
                 <ExpressionCorrectionForm
                   responseId={response.id}
