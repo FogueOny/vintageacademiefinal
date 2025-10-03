@@ -37,11 +37,10 @@ export default function DashboardComprehensionOralePage() {
   if (authLoading || !isAuthenticated) {
     return (
       <div className="container py-10">
-        <div className="flex items-center justify-center py-16">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary/30 border-t-primary mx-auto mb-4"></div>
-            <p className="text-sm text-gray-600">Chargement…</p>
-          </div>
+        <div className="flex flex-col items-center justify-center py-16 space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <p className="text-muted-foreground">Chargement de vos tests...</p>
+          <p className="text-sm text-muted-foreground">Si le chargement prend trop de temps, actualisez la page (F5)</p>
         </div>
       </div>
     );
