@@ -112,11 +112,21 @@ export function useAuthUnified() {
           return preserved;
         }
 
-        // Sinon, essayer une dernière fois sans timeout
+        // Sinon, essayer une dernière fois avec timeout court
         try {
-          console.log('🔄 Tentative de récupération sans timeout...');
+          console.log('🔄 Tentative de récupération (timeout 2s)...');
           const supabase = getSupabaseBrowser();
-          const { data: { user } } = await supabase.auth.getUser();
+          
+          const retryTimeout = new Promise<never>((_, reject) => 
+            setTimeout(() => reject(new Error('Retry timeout')), 2000)
+          );
+          
+          const userResult = await Promise.race([
+            supabase.auth.getUser(),
+            retryTimeout
+          ]);
+          
+          const user = userResult?.data?.user || null;
           
           if (user) {
             console.log('✅ Utilisateur récupéré:', user.email);
