@@ -37,6 +37,7 @@ ON CONFLICT (id) DO UPDATE SET
   allowed_mime_types = ARRAY['audio/webm', 'audio/wav', 'audio/mp3', 'audio/mpeg', 'audio/ogg'];
 
 -- ÉTAPE 3: Créer les policies ULTRA SIMPLES (pas de vérification de dossier)
+-- Policies pour utilisateurs authentifiés
 CREATE POLICY "exam_oral_insert_simple"
 ON storage.objects
 FOR INSERT
@@ -60,6 +61,19 @@ CREATE POLICY "exam_oral_delete_simple"
 ON storage.objects
 FOR DELETE
 TO authenticated
+USING (bucket_id = 'exam-oral-responses');
+
+-- Policies pour utilisateurs anonymes (au cas où)
+CREATE POLICY "exam_oral_insert_anon"
+ON storage.objects
+FOR INSERT
+TO anon
+WITH CHECK (bucket_id = 'exam-oral-responses');
+
+CREATE POLICY "exam_oral_select_anon"
+ON storage.objects
+FOR SELECT
+TO anon
 USING (bucket_id = 'exam-oral-responses');
 
 -- ÉTAPE 4: Vérifier que tout est OK
