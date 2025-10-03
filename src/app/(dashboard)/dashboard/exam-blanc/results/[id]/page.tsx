@@ -133,10 +133,16 @@ export default function ExamBlancResultsPage() {
     );
   }
 
+  console.log('📊 Data comprehension:', data.comprehension);
+  console.log('📊 Expression responses:', expressionResponses);
+  
   const coQuestions = data.comprehension?.filter(q => q.type === 'CO') || [];
   const ceQuestions = data.comprehension?.filter(q => q.type === 'CE') || [];
   const eeResponses = expressionResponses.filter(r => r.type === 'expression_ecrite');
   const eoResponses = expressionResponses.filter(r => r.type === 'expression_orale');
+  
+  console.log('📊 CO Questions:', coQuestions.length);
+  console.log('📊 CE Questions:', ceQuestions.length);
 
   const coCorrect = coQuestions.filter(q => 
     q.user_option_id === q.correct_option_id || q.user_label === q.correct_label
@@ -188,23 +194,37 @@ export default function ExamBlancResultsPage() {
           )}
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div className="bg-blue-50 p-3 rounded">
-              <div className="font-semibold text-blue-900">CO</div>
-              <div className="text-blue-700">{coCorrect}/{coQuestions.length} correct</div>
-            </div>
-            <div className="bg-green-50 p-3 rounded">
-              <div className="font-semibold text-green-900">CE</div>
-              <div className="text-green-700">{ceCorrect}/{ceQuestions.length} correct</div>
-            </div>
-            <div className="bg-orange-50 p-3 rounded">
-              <div className="font-semibold text-orange-900">EE</div>
-              <div className="text-orange-700">{totalEEScore}/50 points</div>
-            </div>
-            <div className="bg-purple-50 p-3 rounded">
-              <div className="font-semibold text-purple-900">EO</div>
-              <div className="text-purple-700">{totalEOScore}/50 points</div>
-            </div>
+            {coQuestions.length > 0 && (
+              <div className="bg-blue-50 p-3 rounded">
+                <div className="font-semibold text-blue-900">CO</div>
+                <div className="text-blue-700">{coCorrect}/{coQuestions.length} correct</div>
+              </div>
+            )}
+            {ceQuestions.length > 0 && (
+              <div className="bg-green-50 p-3 rounded">
+                <div className="font-semibold text-green-900">CE</div>
+                <div className="text-green-700">{ceCorrect}/{ceQuestions.length} correct</div>
+              </div>
+            )}
+            {eeResponses.length > 0 && (
+              <div className="bg-orange-50 p-3 rounded">
+                <div className="font-semibold text-orange-900">EE</div>
+                <div className="text-orange-700">{totalEEScore}/{eeResponses.length * 25} points</div>
+              </div>
+            )}
+            {eoResponses.length > 0 && (
+              <div className="bg-purple-50 p-3 rounded">
+                <div className="font-semibold text-purple-900">EO</div>
+                <div className="text-purple-700">{totalEOScore}/{eoResponses.length * 25} points</div>
+              </div>
+            )}
           </div>
+          
+          {coQuestions.length === 0 && ceQuestions.length === 0 && (
+            <div className="text-sm text-gray-600 mt-2">
+              ⚠️ Les réponses CO/CE n'ont pas été enregistrées pour cet examen
+            </div>
+          )}
         </CardContent>
       </Card>
 
