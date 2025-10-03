@@ -109,15 +109,18 @@ export default function DashboardPage() {
   const loadDashboardData = useCallback(async () => {
     let aborted = false;
     try {
+      console.log('📊 Début chargement dashboard...');
       setLoading(true);
 
       const sessionCheck = await ensureValidSession();
+      console.log('🔐 Session check:', sessionCheck.valid);
       if (!sessionCheck.valid) {
         try { window.localStorage.removeItem('va_role'); } catch (_) {}
         router.replace('/login?next=/dashboard');
         return;
       }
 
+      console.log('📡 Appel API /api/dashboard/overview...');
       const overview = await fetchJsonWithAuth<OverviewResponse>(
         '/api/dashboard/overview',
         { timeoutMs: 8000 }
@@ -125,6 +128,7 @@ export default function DashboardPage() {
 
       if (aborted) return;
 
+      console.log('✅ Données reçues:', { user: overview.user?.email, isAdmin: overview.isAdmin });
       setUser(overview.user);
       setProfile(overview.profile);
 
@@ -188,6 +192,7 @@ export default function DashboardPage() {
         }
       }
     } catch (error: unknown) {
+      console.error('❌ Erreur chargement dashboard:', error);
       if (typeof error === 'object' && error !== null && 'status' in error && (error as { status?: number }).status === 401) {
         try { window.localStorage.removeItem('va_role'); } catch (_) {}
         router.replace('/login?next=/dashboard');
@@ -196,6 +201,7 @@ export default function DashboardPage() {
       console.error('Erreur chargement overview dashboard:', error);
     } finally {
       if (!aborted) {
+        console.log('🏁 Fin chargement - setLoading(false)');
         setLoading(false);
       }
     }
@@ -209,11 +215,15 @@ export default function DashboardPage() {
     let abortCleanup: (() => void) | undefined;
     let mounted = true;
 
+    console.log('🚀 useEffect dashboard monté');
+    
     // Toujours charger les données au montage du composant
     loadDashboardData().then((cleanup) => {
       if (mounted) {
         abortCleanup = cleanup;
       }
+    }).catch((err) => {
+      console.error('❌ Erreur dans loadDashboardData:', err);
     });
 
     try {
