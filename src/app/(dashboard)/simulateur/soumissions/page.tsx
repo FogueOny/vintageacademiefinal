@@ -92,9 +92,8 @@ export default function SubmissionsPage() {
   const evalTaskWithOpenAI = async (attemptId: string, task_number: number) => {
     const det = detailsMap[attemptId];
     if (!det) return;
-    const t = det.tasks.find((x: any) => x.task_number === task_number);
     const ans = det.answers.find((x: any) => x.task_number === task_number);
-    if (!t || !ans?.content) {
+    if (!ans?.content) {
       toast.error("Données insuffisantes pour cette tâche");
       return;
     }
@@ -102,31 +101,36 @@ export default function SubmissionsPage() {
     const key = `${attemptId}:${task_number}`;
     setAiTaskLoading((prev) => ({ ...prev, [key]: true }));
     try {
-      const r = await fetch("/api/simulator/evaluate-task", {
+      // Nouvelle API avec Assistant OpenAI
+      const r = await fetch("/api/ai/evaluate-simulator", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          attemptId,
+          attempt_id: attemptId,
           task_number,
-          task: {
-            title: t.title,
-            instructions: t.instructions,
-            description: t.description,
-            documents: t.documents || [],
-          },
-          answer: { content: ans.content, word_count: ans.word_count },
         }),
       });
-      let j: any = null;
-      const ct = r.headers.get('content-type') || '';
-      if (ct.includes('application/json')) j = await r.json();
-      else { const txt = await r.text(); toast.error(`HTTP ${r.status}: ${txt.slice(0,120)}…`); return; }
-      if (!r.ok) { toast.error(j?.error || `Échec OpenAI (HTTP ${r.status})`); return; }
       
-      const ev: Evaluation = j.evaluation;
+      const j = await r.json();
+      if (!r.ok) { 
+        toast.error(j?.error || `Échec évaluation IA (HTTP ${r.status})`); 
+        return; 
+      }
+      
+      // Convertir le format de la nouvelle API vers l'ancien format
+      const ev: Evaluation = {
+        task_number,
+        score_20: j.evaluation.score_20,
+        cecr_level: j.evaluation.niveau_estime,
+        positives: j.evaluation.points_forts,
+        improvements: j.evaluation.points_amelioration,
+        suggested_correction: j.evaluation.feedback,
+      };
+      
       setAiTaskResults((prev) => ({ ...prev, [key]: ev }));
+      toast.success("✅ Évaluation IA terminée!");
     } catch (e: any) {
-      toast.error(e?.message || "Erreur OpenAI");
+      toast.error(e?.message || "Erreur évaluation IA");
     } finally {
       setAiTaskLoading((prev) => ({ ...prev, [key]: false }));
     }

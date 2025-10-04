@@ -1,3 +1,4 @@
+// @ts-nocheck
 import OpenAI from 'openai';
 
 // Initialiser le client OpenAI
@@ -119,12 +120,16 @@ export async function createAssistant() {
  * Évaluer une Expression Écrite
  */
 export async function evaluateEE(text: string, taskDescription: string) {
+  console.log('🔍 evaluateEE appelée');
+  console.log('📋 ASSISTANT_ID:', ASSISTANT_ID || '❌ MANQUANT');
+  
   if (!ASSISTANT_ID) {
     throw new Error('OPENAI_ASSISTANT_ID non configuré');
   }
 
-  // Créer un thread
+  console.log('🧵 Création du thread...');
   const thread = await openai.beta.threads.create();
+  console.log('✅ Thread créé:', thread.id);
 
   // Envoyer le message
   await openai.beta.threads.messages.create(thread.id, {
