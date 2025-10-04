@@ -120,16 +120,17 @@ export async function createAssistant() {
  * Évaluer une Expression Écrite
  */
 export async function evaluateEE(text: string, taskDescription: string) {
-  console.log('🔍 evaluateEE appelée');
-  console.log('📋 ASSISTANT_ID:', ASSISTANT_ID || '❌ MANQUANT');
-  
-  if (!ASSISTANT_ID) {
-    throw new Error('OPENAI_ASSISTANT_ID non configuré');
-  }
+  try {
+    console.log('🔍 evaluateEE appelée');
+    console.log('📋 ASSISTANT_ID:', ASSISTANT_ID || '❌ MANQUANT');
+    
+    if (!ASSISTANT_ID) {
+      throw new Error('OPENAI_ASSISTANT_ID non configuré');
+    }
 
-  console.log('🧵 Création du thread...');
-  const thread = await openai.beta.threads.create();
-  console.log('✅ Thread créé:', thread.id);
+    console.log('🧵 Création du thread...');
+    const thread = await openai.beta.threads.create();
+    console.log('✅ Thread créé:', thread.id);
 
   // Envoyer le message
   await openai.beta.threads.messages.create(thread.id, {
@@ -144,20 +145,26 @@ ${text}
   });
 
   // Exécuter l'assistant
+  console.log('🚀 Lancement du run avec assistant:', ASSISTANT_ID);
   const run = await openai.beta.threads.runs.create(thread.id, {
     assistant_id: ASSISTANT_ID,
   });
+  console.log('✅ Run créé:', run.id);
 
   // Attendre la fin de l'exécution
-  let runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+  console.log('⏳ Attente de la fin du run...');
+  let runStatus = await openai.beta.threads.runs.retrieve(run.id, thread.id);
+  console.log('📊 Status initial:', runStatus.status);
   
   while (runStatus.status !== 'completed') {
     if (runStatus.status === 'failed' || runStatus.status === 'cancelled' || runStatus.status === 'expired') {
+      console.error('❌ Run échoué:', runStatus);
       throw new Error(`Run failed with status: ${runStatus.status}`);
     }
     
     await new Promise(resolve => setTimeout(resolve, 1000));
-    runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+    runStatus = await openai.beta.threads.runs.retrieve(run.id, thread.id);
+    console.log('📊 Status:', runStatus.status);
   }
 
   // Récupérer la réponse
@@ -187,6 +194,11 @@ ${text}
     ...evaluation,
     thread_id: thread.id,
   };
+  } catch (error: any) {
+    console.error('❌ Erreur dans evaluateEE:', error);
+    console.error('Stack:', error.stack);
+    throw error;
+  }
 }
 
 /**
@@ -244,7 +256,7 @@ ${transcription}
     assistant_id: ASSISTANT_ID,
   });
 
-  let runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+  let runStatus = await openai.beta.threads.runs.retrieve(run.id, thread.id);
   
   while (runStatus.status !== 'completed') {
     if (runStatus.status === 'failed' || runStatus.status === 'cancelled' || runStatus.status === 'expired') {
@@ -252,7 +264,7 @@ ${transcription}
     }
     
     await new Promise(resolve => setTimeout(resolve, 1000));
-    runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+    runStatus = await openai.beta.threads.runs.retrieve(run.id, thread.id);
   }
 
   const messages = await openai.beta.threads.messages.list(thread.id);
