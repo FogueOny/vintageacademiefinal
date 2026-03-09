@@ -18,7 +18,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 
 // Fonction pour ouvrir WhatsApp avec un message prédéfini
 const openWhatsApp = (message: string) => {
-  const phoneNumber = "237652385531"; // Numéro WhatsApp de Vintage Académie
+  const phoneNumber = "237652385531"; // Numéro WhatsApp de Vintage Académie de ARMEL
   const encodedMessage = encodeURIComponent(message);
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
   window.open(whatsappUrl, '_blank');
