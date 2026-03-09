@@ -3,61 +3,40 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
-import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase/client";
-import { AuthChangeEvent, Session } from "@supabase/supabase-js";
 import { FloatingWhatsAppButton } from "@/components/floating-whatsapp-button";
 import { ProfessionalFooter } from "@/components/professional-footer";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-// Animation variants
-const fadeIn = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
-    y: 0,
-    transition: { duration: 0.6 }
-  }
-};
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2
-    }
-  }
-};
-
-const cardVariant = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
-    y: 0,
-    transition: { duration: 0.4 }
-  }
-};
 
 // Fonction pour ouvrir WhatsApp avec un message prédéfini
 const openWhatsApp = (message: string) => {
-  const phoneNumber = "+237652385531"; // Numéro WhatsApp de Vintage Académie
+  const phoneNumber = "237652385531"; // Numéro WhatsApp de Vintage Académie
   const encodedMessage = encodeURIComponent(message);
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
   window.open(whatsappUrl, '_blank');
 };
 
 export default function Home() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const router = useRouter();
   const [comingSoonOpen, setComingSoonOpen] = useState(false);
+  const [courseModalOpen, setCourseModalOpen] = useState(false);
   const openComingSoon: React.MouseEventHandler<HTMLAnchorElement | HTMLButtonElement> = (e) => {
     try { e.preventDefault(); } catch (_) {}
     setComingSoonOpen(true);
   };
   const closeComingSoon = () => setComingSoonOpen(false);
+  const openCourseModal: React.MouseEventHandler<HTMLAnchorElement | HTMLButtonElement> = (e) => {
+    try { e.preventDefault(); } catch (_) {}
+    setCourseModalOpen(true);
+  };
+  const closeCourseModal = () => setCourseModalOpen(false);
   // Close on Escape
   useEffect(() => {
     if (!comingSoonOpen) return;
@@ -67,40 +46,6 @@ export default function Home() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [comingSoonOpen]);
-  
-  // Vérifier si l'utilisateur est connecté au chargement de la page
-  useEffect(() => {
-    const checkLoginStatus = async () => {
-      try {
-        // Vérifier si l'utilisateur est connecté
-        const supabaseClient = supabase();
-        if (!supabaseClient) {
-          console.error("Supabase client not available");
-          return;
-        }
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        setIsLoggedIn(!!session);
-      } catch (error) {
-        console.error("Erreur de vérification de session:", error);
-        setIsLoggedIn(false);
-      }
-    };
-    
-    checkLoginStatus();
-    
-    // Écouter les changements d'authentification d
-    const { data: authListener } = supabase().auth.onAuthStateChange(
-      (event: AuthChangeEvent, session: Session | null) => {
-        setIsLoggedIn(!!session);
-      }
-    );
-
-    return () => {
-      authListener?.subscription.unsubscribe();
-    };
-  }, []);
-  
-  // Public homepage: no client-side redirection based on session
   
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -121,9 +66,9 @@ export default function Home() {
                   <div className="bg-orange-500 text-white rounded-lg p-6 transform transition-transform hover:scale-105">
                     <h2 className="text-2xl font-bold mb-4">Nos Cours</h2>
                     <p className="mb-4">Préparez-vous aux examens TCF, TEF, IELTS et vos certifications avec nos cours spécialisés.</p>
-                    <Link href="/services/tcf" className="inline-block w-full bg-white text-orange-500 font-bold py-3 px-4 rounded text-center">
+                    <button onClick={openCourseModal} className="inline-block w-full bg-white text-orange-500 font-bold py-3 px-4 rounded text-center">
                       Je choisis un cours
-                    </Link>
+                    </button>
                   </div>
                   
                   {/* Card Contact WhatsApp */}
@@ -181,329 +126,102 @@ export default function Home() {
           </div>
         )}
         
-        {/* Section des cartes de services */}
+        {/* Section Nos programmes de préparation */}
         <section className="py-16 bg-gradient-to-b from-white to-gray-50">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-8">
-              {/* Card 1: Préparations aux tests de langues - Nouveau design */}
-              <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 transform hover:-translate-y-1">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-4">Nos programmes de préparation</h2>
+              <p className="text-gray-600">Choisissez le programme adapté à vos objectifs</p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              {/* Card TCF */}
+              <a 
+                href="https://tcf.vintageacademie.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 transform hover:-translate-y-1"
+              >
                 <div className="h-1 bg-gradient-to-r from-blue-400 to-blue-600"></div>
                 <div className="p-8">
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 rounded-full bg-blue-100">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                        </svg>
-                      </div>
-                      <h3 className="text-2xl font-bold text-gray-800">Préparations aux tests de langues</h3>
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="p-3 rounded-full bg-blue-100">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                      </svg>
                     </div>
+                    <h3 className="text-2xl font-bold text-gray-800">TCF</h3>
                   </div>
                   
-                  <p className="text-gray-600 mb-6">Préparez-vous efficacement aux tests standardisés avec nos programmes complets. Coaching personnalisé et ressources exclusives.</p>
+                  <p className="text-gray-600 mb-6">Test de Connaissance du Français - Préparez-vous efficacement avec nos ressources complètes et nos exercices interactifs.</p>
                   
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
-                    <Link href="#toeic" onClick={openComingSoon} className="group py-2 px-3 bg-blue-50 hover:bg-blue-600 hover:text-white rounded-lg text-center text-sm font-medium text-blue-600 transition-all flex items-center justify-center">
-                      <span>TOEIC</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                      </svg>
-                    </Link>
-                    <Link href="#toefl" onClick={openComingSoon} className="group py-2 px-3 bg-blue-50 hover:bg-blue-600 hover:text-white rounded-lg text-center text-sm font-medium text-blue-600 transition-all flex items-center justify-center">
-                      <span>TOEFL</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                      </svg>
-                    </Link>
-                    <Link href="#ielts" onClick={openComingSoon} className="group py-2 px-3 bg-blue-50 hover:bg-blue-600 hover:text-white rounded-lg text-center text-sm font-medium text-blue-600 transition-all flex items-center justify-center">
-                      <span>IELTS</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                      </svg>
-                    </Link>
-                    <Link href="#dele" onClick={openComingSoon} className="group py-2 px-3 bg-blue-50 hover:bg-blue-600 hover:text-white rounded-lg text-center text-sm font-medium text-blue-600 transition-all flex items-center justify-center">
-                      <span>DELE</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                      </svg>
-                    </Link>
-                    <Link href="/services/tcf" className="group py-2 px-3 bg-blue-50 hover:bg-blue-600 hover:text-white rounded-lg text-center text-sm font-medium text-blue-600 transition-all flex items-center justify-center">
-                      <span>TCF</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                      </svg>
-                    </Link>
-                    <Link href="#tef" onClick={openComingSoon} className="group py-2 px-3 bg-blue-50 hover:bg-blue-600 hover:text-white rounded-lg text-center text-sm font-medium text-blue-600 transition-all flex items-center justify-center">
-                      <span>TEF</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                      </svg>
-                    </Link>
+                  <div className="flex items-center text-blue-600 font-medium">
+                    <span>Accéder au programme</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
                   </div>
                 </div>
-              </div>
+              </a>
               
-              {/* Card 2: Immigration et mobilité internationale */}
-              <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 transform hover:-translate-y-1">
-                <div className="h-1 bg-gradient-to-r from-red-400 to-red-600"></div>
-                <div className="p-8">
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 rounded-full bg-orange-100">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-orange-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <circle cx="12" cy="12" r="10"></circle>
-                          <path d="M2 12h20"></path>
-                          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-                        </svg>
-                      </div>
-                      <h3 className="text-2xl font-bold text-gray-800">Immigration & Mobilité</h3>
-                    </div>
-                  </div>
-                  
-                  <p className="text-gray-600 mb-6">Accompagnement complet pour vos projets d'immigration et de mobilité internationale. Conseils personnalisés et suivi administratif.</p>
-                  
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
-                    <Link href="#services/immigration-allemagne" onClick={openComingSoon} className="group py-2 px-3 bg-orange-50 hover:bg-orange-600 hover:text-white rounded-lg text-center text-sm font-medium text-orange-600 transition-all flex items-center justify-center">
-                      <span>Allemagne</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                      </svg>
-                    </Link>
-                    <Link href="#services/immigration-canada" onClick={openComingSoon} className="group py-2 px-3 bg-orange-50 hover:bg-orange-600 hover:text-white rounded-lg text-center text-sm font-medium text-orange-600 transition-all flex items-center justify-center">
-                      <span>Canada</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                      </svg>
-                    </Link>
-                    
-                  </div>
-                </div>
-              </div>
-              
-              {/* Card 3: Certifications et Formation - Nouveau design fusionné maintenant D'ACCORD, */}
-              <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 transform hover:-translate-y-1">
-                <div className="h-1 bg-gradient-to-r from-green-400 to-purple-600"></div>
-                <div className="p-8">
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 rounded-full bg-gradient-to-br from-green-100 to-purple-100">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gradient-to-r from-green-600 to-purple-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                          <circle cx="9" cy="7" r="4"/>
-                          <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-                          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                        </svg>
-                      </div>
-                      <h3 className="text-2xl font-bold text-gray-800">Certifications & Formation</h3>
-                    </div>
-                  </div>
-                  
-                  <p className="text-gray-600 mb-6">Renforcez vos compétences professionnelles avec nos formations spécialisées en informatique et en management de projet.</p>
-                  
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-4">
-                    <Link href="#services/cisco" onClick={openComingSoon} className="group py-2 px-3 bg-gradient-to-r from-green-50 to-green-100 hover:from-green-600 hover:to-green-700 hover:text-white rounded-lg text-center text-sm font-medium text-green-600 transition-all flex items-center justify-center">
-                      <span>CISCO</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                      </svg>
-                    </Link>
-                    <Link href="#services/pmp" onClick={openComingSoon} className="group py-2 px-3 bg-gradient-to-r from-green-50 to-green-100 hover:from-green-600 hover:to-green-700 hover:text-white rounded-lg text-center text-sm font-medium text-green-600 transition-all flex items-center justify-center">
-                      <span>PMP</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                      </svg>
-                    </Link>
-                    <Link href="#services/aws" onClick={openComingSoon} className="group py-2 px-3 bg-gradient-to-r from-green-50 to-green-100 hover:from-green-600 hover:to-green-700 hover:text-white rounded-lg text-center text-sm font-medium text-green-600 transition-all flex items-center justify-center">
-                      <span>AWS</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                      </svg>
-                    </Link>
-                    <Link href="#services/developpement-web" onClick={openComingSoon} className="group py-2 px-3 bg-gradient-to-r from-purple-50 to-purple-100 hover:from-purple-600 hover:to-purple-700 hover:text-white rounded-lg text-center text-sm font-medium text-purple-600 transition-all flex items-center justify-center">
-                      <span>Dév Web</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                      </svg>
-                    </Link>
-                    <Link href="#services/marketing-digital" onClick={openComingSoon} className="group py-2 px-3 bg-gradient-to-r from-purple-50 to-purple-100 hover:from-purple-600 hover:to-purple-700 hover:text-white rounded-lg text-center text-sm font-medium text-purple-600 transition-all flex items-center justify-center">
-                      <span>Marketing</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                      </svg>
-                    </Link>
-                    <Link href="#services/bureautique" onClick={openComingSoon} className="group py-2 px-3 bg-gradient-to-r from-purple-50 to-purple-100 hover:from-purple-600 hover:to-purple-700 hover:text-white rounded-lg text-center text-sm font-medium text-purple-600 transition-all flex items-center justify-center">
-                      <span>Bureautique</span>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M5 12h14M12 5l7 7-7 7"/>
-                      </svg>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-        
-        {/* Section Tarification */}
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-4">Nos formules d'abonnement</h2>
-            <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">Choisissez la formule qui convient à vos besoins et commencez votre préparation dès aujourd'hui</p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Pack Bronze */}
-              <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl overflow-hidden border border-amber-200 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col">
-                <div className="p-6 flex-1">
-                  <div className="bg-gradient-to-r from-amber-500 to-yellow-500 inline-block rounded-full px-3 py-1 text-sm font-medium text-white mb-4">Bronze</div>
-                  <h3 className="text-2xl font-bold mb-2">5 jours</h3>
-                  <div className="text-3xl font-bold text-gray-900 mb-1">15 000 FCFA</div>
-                  <p className="text-gray-600 mb-6">Accès pendant 5 jours</p>
-                  <ul className="mb-8 space-y-3">
-                    <li className="flex items-center">
-                      <svg className="h-5 w-5 text-amber-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="text-gray-600">Compréhension Écrite : 36 tests d'entraînement</span>
-                    </li>
-                    <li className="flex items-center">
-                      <svg className="h-5 w-5 text-amber-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="text-gray-600">Compréhension Orale : 32 tests d'entraînement</span>
-                    </li>
-                    <li className="flex items-center">
-                      <svg className="h-5 w-5 text-amber-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="text-gray-600">Expression Orale : Corrections Tâche 2</span>
-                    </li>
-                    <li className="flex items-center">
-                      <svg className="h-5 w-5 text-amber-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="text-gray-600">Expression Orale : Corrections Tâche 3</span>
-                    </li>
-                  </ul>
-                </div>
-                <div className="p-6 bg-amber-50">
-                  <Button 
-                    onClick={() => openWhatsApp("Bonjour, je souhaite m'abonner à la formule Bronze.")} 
-                    className="w-full bg-amber-600 hover:bg-amber-700 text-white" 
-                    size="lg"
-                  >
-                    S'abonner
-                  </Button>
-                </div>
-              </div>
-              
-              {/* Pack Silver */}
-              <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl overflow-hidden border border-gray-200 shadow hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 flex flex-col relative">
-                <div className="absolute top-0 right-0 bg-gray-500 text-white px-4 py-1 text-sm font-medium rounded-bl-lg">Populaire</div>
-                <div className="p-6 flex-1">
-                  <div className="bg-gradient-to-r from-gray-400 to-gray-500 inline-block rounded-full px-3 py-1 text-sm font-medium text-white mb-4">Silver</div>
-                  <h3 className="text-2xl font-bold mb-2">30 jours</h3>
-                  <div className="text-3xl font-bold text-gray-900 mb-1">30 000 FCFA</div>
-                  <p className="text-gray-600 mb-6">Accès pendant 1 mois</p>
-                  <ul className="mb-8 space-y-3">
-                    <li className="flex items-center">
-                      <svg className="h-5 w-5 text-gray-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="text-gray-600">Compréhension Écrite : 36 tests d'entraînement</span>
-                    </li>
-                    <li className="flex items-center">
-                      <svg className="h-5 w-5 text-gray-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="text-gray-600">Compréhension Orale : 32 tests d'entraînement</span>
-                    </li>
-                    <li className="flex items-center">
-                      <svg className="h-5 w-5 text-gray-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="text-gray-600">Expression Orale : Corrections Tâche 2</span>
-                    </li>
-                    <li className="flex items-center">
-                      <svg className="h-5 w-5 text-gray-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="text-gray-600">Expression Orale : Corrections Tâche 3</span>
-                    </li>
-                  </ul>
-                </div>
-                <div className="p-6 bg-gray-50">
-                  <Button 
-                    onClick={() => openWhatsApp("Bonjour, je souhaite m'abonner à la formule Silver.")} 
-                    className="w-full bg-gray-600 hover:bg-gray-700 text-white" 
-                    size="lg"
-                  >
-                    S'abonner
-                  </Button>
-                </div>
-              </div>
-              
-              {/* Pack Gold */}
-              <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl overflow-hidden border border-orange-200 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col">
-                <div className="p-6 flex-1">
-                  <div className="bg-gradient-to-r from-yellow-500 to-orange-500 inline-block rounded-full px-3 py-1 text-sm font-medium text-white mb-4">Gold</div>
-                  <h3 className="text-2xl font-bold mb-2">60 jours</h3>
-                  <div className="text-3xl font-bold text-gray-900 mb-1">55 000 FCFA</div>
-                  <p className="text-gray-600 mb-6">Accès pendant 2 mois</p>
-                  <ul className="mb-8 space-y-3">
-                    <li className="flex items-center">
-                      <svg className="h-5 w-5 text-orange-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="text-gray-600">Compréhension Écrite : 36 tests d'entraînement</span>
-                    </li>
-                    <li className="flex items-center">
-                      <svg className="h-5 w-5 text-orange-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="text-gray-600">Compréhension Orale : 32 tests d'entraînement</span>
-                    </li>
-                    <li className="flex items-center">
-                      <svg className="h-5 w-5 text-orange-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="text-gray-600">Expression Orale : Corrections Tâche 2</span>
-                    </li>
-                    <li className="flex items-center">
-                      <svg className="h-5 w-5 text-orange-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <span className="text-gray-600">Expression Orale : Corrections Tâche 3</span>
-                    </li>
-                  </ul>
-                </div>
-                <div className="p-6 bg-orange-50">
-                  <Button 
-                    onClick={() => openWhatsApp("Bonjour, je souhaite m'abonner à la formule Gold.")} 
-                    className="w-full bg-orange-600 hover:bg-orange-700 text-white" 
-                    size="lg"
-                  >
-                    S'abonner
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-        
-        {/* CTA Banner */}
-        <section className="py-8 bg-blue-50">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-col md:flex-row items-center justify-between">
-              <div className="mb-4 md:mb-0">
-                <p className="text-blue-800 text-lg">Découvrez notre simulateur d'examen pour vous préparer efficacement aux certifications :</p>
-              </div>
-              <button 
-                onClick={() => openWhatsApp("Bonjour, je suis enseignant et je souhaite des informations sur vos services de préparation aux certifications. Merci.")} 
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors inline-flex items-center"
+              {/* Card IELTS */}
+              <a 
+                href="https://ielts.vintageacademie.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 transform hover:-translate-y-1"
               >
-                Réservez une démo !
-              </button>
+                <div className="h-1 bg-gradient-to-r from-green-400 to-green-600"></div>
+                <div className="p-8">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="p-3 rounded-full bg-green-100">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M2 12h20"></path>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                      </svg>
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-800">IELTS</h3>
+                  </div>
+                  
+                  <p className="text-gray-600 mb-6">International English Language Testing System - Atteignez vos objectifs avec notre programme de préparation complet.</p>
+                  
+                  <div className="flex items-center text-green-600 font-medium">
+                    <span>Accéder au programme</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </div>
+              </a>
+              
+              {/* Card Cours d'Allemand */}
+              <div className="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100 opacity-60 cursor-not-allowed">
+                <div className="h-1 bg-gradient-to-r from-gray-300 to-gray-400"></div>
+                <div className="p-8">
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="p-3 rounded-full bg-gray-100">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                      </svg>
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-800">Cours d'Allemand</h3>
+                  </div>
+                  
+                  <p className="text-gray-600 mb-6">Apprenez l'allemand avec nos cours structurés et nos formateurs expérimentés. Programme complet pour tous les niveaux.</p>
+                  
+                  <div className="flex items-center text-gray-400 font-medium">
+                    <span>Bientôt disponible</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -603,7 +321,136 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* CTA Section avant le footer */}
+        <section className="py-16 bg-gradient-to-r from-orange-500 to-orange-600">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto text-center text-white">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Prêt à commencer votre préparation ?</h2>
+              <p className="text-lg mb-8 text-orange-50">Rejoignez des milliers d'étudiants qui ont réussi leurs examens avec Vintage Académie</p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button 
+                  onClick={openCourseModal}
+                  size="lg"
+                  className="bg-white text-orange-600 hover:bg-orange-50 font-bold text-lg px-8 py-6"
+                >
+                  Choisir un programme
+                </Button>
+                <Button 
+                  onClick={() => openWhatsApp("Bonjour, je souhaite des informations sur vos programmes de préparation.")} 
+                  size="lg"
+                  variant="outline"
+                  className="border-2 border-white text-white hover:bg-white hover:text-orange-600 font-bold text-lg px-8 py-6"
+                >
+                  Nous contacter
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
+
+      {/* Course Selection Modal */}
+      <Dialog open={courseModalOpen} onOpenChange={setCourseModalOpen}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold">Choisissez votre programme</DialogTitle>
+            <DialogDescription>
+              Sélectionnez le programme qui correspond à vos objectifs
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <a
+              href="https://tcf.vintageacademie.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group"
+            >
+              <Card className="hover:shadow-lg transition-all duration-300 border-2 hover:border-blue-500 cursor-pointer">
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-blue-100 group-hover:bg-blue-200 transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                      </svg>
+                    </div>
+                    <CardTitle>TCF</CardTitle>
+                  </div>
+                  <CardDescription>Test de Connaissance du Français</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-3">Préparation complète avec exercices interactifs et corrections détaillées.</p>
+                  <div className="flex items-center text-blue-600 font-medium text-sm">
+                    <span>Accéder maintenant</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </CardContent>
+              </Card>
+            </a>
+
+            <a
+              href="https://ielts.vintageacademie.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group"
+            >
+              <Card className="hover:shadow-lg transition-all duration-300 border-2 hover:border-green-500 cursor-pointer">
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-green-100 group-hover:bg-green-200 transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M2 12h20"></path>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                      </svg>
+                    </div>
+                    <CardTitle>IELTS</CardTitle>
+                  </div>
+                  <CardDescription>International English Language Testing System</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-3">Programme complet pour atteindre vos objectifs de score.</p>
+                  <div className="flex items-center text-green-600 font-medium text-sm">
+                    <span>Accéder maintenant</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                  </div>
+                </CardContent>
+              </Card>
+            </a>
+
+            <Card className="opacity-60 cursor-not-allowed col-span-1 md:col-span-2">
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-gray-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                      <circle cx="9" cy="7" r="4"/>
+                      <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                  </div>
+                  <CardTitle className="text-gray-500">Cours d'Allemand</CardTitle>
+                </div>
+                <CardDescription>Programme complet pour tous les niveaux</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-500 mb-3">Apprenez l'allemand avec nos formateurs expérimentés.</p>
+                <div className="flex items-center text-gray-400 font-medium text-sm">
+                  <span>Bientôt disponible</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </DialogContent>
+      </Dialog>
       
       <FloatingWhatsAppButton />
       <ProfessionalFooter />

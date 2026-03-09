@@ -16,10 +16,10 @@ import { cn } from "@/lib/utils";
 import { GraduationCap, Globe2, Monitor, BookOpen, Award, Users } from "lucide-react";
 
 export const PUBLIC_LINKS = [
-  { href: "/", label: "Accueil" },
-  { href: "/services/tcf", label: "TCF" },
-  { href: "/about", label: "À propos" },
-  { href: "/contact", label: "Contact" },
+  { href: "/", label: "Accueil", external: false },
+  { href: "https://tcf.vintageacademie.com", label: "TCF", external: true },
+  { href: "https://ielts.vintageacademie.com", label: "IELTS", external: true },
+  { href: "#", label: "Cours d'Allemand", external: false, disabled: true },
 ];
 
 export function MainNavigation() {
@@ -30,17 +30,36 @@ export function MainNavigation() {
       <NavigationMenuList className="flex justify-center items-center gap-2">
         {PUBLIC_LINKS.map((item) => (
           <NavigationMenuItem key={item.href}>
-            <NavigationMenuLink asChild>
-              <Link
-                href={item.href}
-                className={cn(
-                  "group inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-orange-50 hover:text-orange-600 focus:bg-orange-50 focus:text-orange-600 focus:outline-none disabled:pointer-events-none disabled:opacity-50",
-                  pathname === item.href ? "bg-orange-50 text-orange-600" : "text-gray-600"
-                )}
+            {(item as any).disabled ? (
+              <span
+                className="inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium text-gray-400 cursor-not-allowed opacity-60"
               >
                 {item.label}
-              </Link>
-            </NavigationMenuLink>
+              </span>
+            ) : (item as any).external ? (
+              <NavigationMenuLink asChild>
+                <a
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-orange-50 hover:text-orange-600 focus:bg-orange-50 focus:text-orange-600 focus:outline-none text-gray-600"
+                >
+                  {item.label}
+                </a>
+              </NavigationMenuLink>
+            ) : (
+              <NavigationMenuLink asChild>
+                <Link
+                  href={item.href}
+                  className={cn(
+                    "group inline-flex h-9 w-max items-center justify-center rounded-md bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-orange-50 hover:text-orange-600 focus:bg-orange-50 focus:text-orange-600 focus:outline-none disabled:pointer-events-none disabled:opacity-50",
+                    pathname === item.href ? "bg-orange-50 text-orange-600" : "text-gray-600"
+                  )}
+                >
+                  {item.label}
+                </Link>
+              </NavigationMenuLink>
+            )}
           </NavigationMenuItem>
         ))}
       </NavigationMenuList>

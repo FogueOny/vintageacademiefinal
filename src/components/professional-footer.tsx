@@ -31,7 +31,14 @@ export function ProfessionalFooter() {
           <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6 text-sm">
             <div className="flex items-center">
               <Phone size={16} className="mr-2 text-orange-500" />
-              <span>+237 652 385 531</span>
+              <a 
+                href="https://wa.me/237652385531?text=Bonjour,%20je%20souhaite%20des%20informations%20sur%20vos%20services."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-orange-500 transition-colors"
+              >
+                +237 6 52 38 55 31
+              </a>
             </div>
             <div>
               <span>Douala, Cameroun</span>
@@ -43,19 +50,18 @@ export function ProfessionalFooter() {
 
           {/* Copyright */}
           <div className="text-sm text-center md:text-right">
-            <p>© {currentYear} Vintage Académie</p>
-            <a
-              href={evolueHref}
-              target={hasEvolueUrl ? "_blank" : undefined}
-              rel={hasEvolueUrl ? "noopener noreferrer" : undefined}
-              className={
-                "text-orange-500 hover:text-orange-400 hover:underline" +
-                (hasEvolueUrl ? "" : " cursor-not-allowed opacity-80 no-underline")
-              }
-              aria-disabled={hasEvolueUrl ? undefined : true}
-            >
-              Développé par EVOLUE
-            </a>
+            <p>© {currentYear} Vintage Académie. Tous droits réservés.</p>
+            <p className="mt-1">
+              En partenariat avec{' '}
+              <a
+                href="https://hevolue.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-300 hover:text-orange-500 hover:underline transition-colors"
+              >
+                Hevolue
+              </a>
+            </p>
           </div>
         </div>
       </div>
